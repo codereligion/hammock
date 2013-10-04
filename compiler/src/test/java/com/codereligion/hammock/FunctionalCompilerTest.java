@@ -54,7 +54,7 @@ public class FunctionalCompilerTest {
 
     @Test
     public void invalidUseOnTwoArgumentInstanceMethod() throws IOException {
-        assertThat(compilationOf(InvalidUseOnTwoArgumentInstanceMethod.class), failedAtLine(12));
+        assertThat(compilationOf(InvalidUseOnTwoArgumentInstanceMethod.class), failedAtLine(13));
     }
 
     @Test
@@ -74,12 +74,12 @@ public class FunctionalCompilerTest {
 
     @Test
     public void invalidUseOnNoArgumentStaticMethod() throws IOException {
-        assertThat(compilationOf(InvalidUseOnNoArgumentStaticMethod.class), failedAtLine(7));
+        assertThat(compilationOf(InvalidUseOnNoArgumentStaticMethod.class), failedAtLine(8));
     }
 
     @Test
     public void invalidUseOnTwoArgumentStaticMethod() throws IOException {
-        assertThat(compilationOf(InvalidUseOnTwoArgumentStaticMethod.class), failedAtLine(8));
+        assertThat(compilationOf(InvalidUseOnTwoArgumentStaticMethod.class), failedAtLine(9));
     }
 
 }

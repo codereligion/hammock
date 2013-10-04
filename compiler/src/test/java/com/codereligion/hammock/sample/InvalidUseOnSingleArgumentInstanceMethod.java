@@ -6,7 +6,7 @@ import com.google.common.base.Objects;
 public class InvalidUseOnSingleArgumentInstanceMethod {
 
     private String first;
-    
+
     @Functional
     public String getFirst(String defaultValue) {
         return Objects.firstNonNull(first, defaultValue);
@@ -15,5 +15,5 @@ public class InvalidUseOnSingleArgumentInstanceMethod {
     public void setFirst(String first) {
         this.first = first;
     }
-    
+
 }

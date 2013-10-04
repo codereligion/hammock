@@ -1,8 +1,6 @@
 package com.codereligion.hammock;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import com.google.gag.annotation.remark.Booyah;
 import com.google.gag.annotation.remark.Hack;
 
@@ -28,7 +26,7 @@ import static java.util.Collections.singleton;
 final class ProcessorRunner {
 
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-    
+
     private final Function<Class<?>, File> toResource = new Function<Class<?>, File>() {
 
         private final ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -41,23 +39,23 @@ final class ProcessorRunner {
             if (url == null) {
                 throw sneakyThrow(new FileNotFoundException(name));
             }
-            
+
             try {
                 return new File(url.toURI().getSchemeSpecificPart());
             } catch (URISyntaxException ex) {
                 return new File(url.getFile());
             }
         }
-        
+
     };
 
     /**
      * Throws any checked exception without the need to declare it in the
      * throws clause.
-     * 
-     * @see <a href="http://blog.jayway.com/2010/01/29/sneaky-throw">blog.jayway.com/2010/01/29/sneaky-throw</a>
+     *
      * @param throwable the throwable to throw
      * @return never, this method <strong>always</strong> throws an exception
+     * @see <a href="http://blog.jayway.com/2010/01/29/sneaky-throw">blog.jayway.com/2010/01/29/sneaky-throw</a>
      */
     @Hack
     @Booyah
@@ -71,12 +69,12 @@ final class ProcessorRunner {
         throw (T) checkNotNull(throwable, "Throwable");
     }
 
-    public DiagnosticCollector<JavaFileObject> compile(Processor processor, Class<?>... classes) 
-            throws IOException {
+    public DiagnosticCollector<JavaFileObject> compile(Processor processor, Class<?>... classes)
+        throws IOException {
 
         final Iterable<File> files = transform(asList(classes), toResource);
         final DiagnosticCollector<JavaFileObject> collector = new DiagnosticCollector<>();
-        
+
         try (StandardJavaFileManager manager = compiler.getStandardFileManager(collector, null, null)) {
             final List<String> options = asList("-proc:only");
             final Iterable<? extends JavaFileObject> units = manager.getJavaFileObjectsFromFiles(files);

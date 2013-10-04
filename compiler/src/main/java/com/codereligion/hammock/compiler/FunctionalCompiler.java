@@ -2,7 +2,6 @@ package com.codereligion.hammock.compiler;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
@@ -17,7 +16,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic.Kind;
 import java.util.ArrayList;
@@ -76,10 +74,10 @@ public class FunctionalCompiler extends AbstractProcessor {
             }
         }
     }
-    
+
     private void parse(Element element) {
         final ExecutableElement method = (ExecutableElement) element;
-        
+
         check(method);
 
         final Types types = processingEnv.getTypeUtils();

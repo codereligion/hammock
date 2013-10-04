@@ -1,7 +1,5 @@
 package com.codereligion.hammock.sample;
 
-import com.codereligion.hammock.Functional;
-
 public class ValidUseOnNoInstanceMethods {
 
     private String first;
