@@ -1,0 +1,14 @@
+### IntelliJ ###
+*.iml
+*.ipr
+*.iws
+.idea/
+
+### Gradle ###
+# Exclude Folder List #
+.gradle/
+build/
+
+
+### Jekyll ###
+_site/

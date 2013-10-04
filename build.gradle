@@ -1,0 +1,63 @@
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    ext.packaging = 'jar'
+
+    repositories {
+        mavenCentral()
+    }
+
+    configurations {
+        provided
+    }
+
+    sourceSets {
+        main.compileClasspath += configurations.provided
+        test.compileClasspath += configurations.provided
+        test.runtimeClasspath += configurations.provided
+    }
+
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+
+    tasks.withType(Compile) {
+        options.encoding = 'UTF-8'
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs = ['-Werror', '-Xlint']
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from 'build/docs/javadoc'
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives jar
+        archives javadocJar
+        archives sourcesJar
+    }
+    
+    task pom << {
+        pom {
+            project {
+                artifactId 'hammock-' + project.name
+                licenses {
+                    license {
+                        name 'The MIT License (MIT)'
+                        url 'http://choosealicense.com/licenses/mit/'
+                        distribution 'repo'
+                    }
+                }
+            }
+        }.writeTo("$buildDir/pom.xml")
+    }
+    
+}
