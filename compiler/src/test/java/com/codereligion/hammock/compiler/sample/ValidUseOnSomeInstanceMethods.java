@@ -1,4 +1,4 @@
-package com.codereligion.hammock.sample;
+package com.codereligion.hammock.compiler.sample;
 
 import com.codereligion.hammock.Functional;
 

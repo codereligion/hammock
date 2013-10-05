@@ -1,0 +1,63 @@
+package {{packageName}};
+{{#imports}}
+
+import {{.}};
+{{/imports}}
+{{#hasFunctions}}
+
+import com.google.common.base.Function;
+{{/hasFunctions}}
+{{#hasPredicates}}
+
+import com.google.common.base.Predicate;
+{{/hasPredicates}}
+
+import javax.annotation.Generated;
+import javax.annotation.Nullable;
+
+@Generated("com.codereligion.hammock.compiler.FunctionalCompiler")
+public final class {{simpleSourceName}}_ {
+    {{#functions}}
+
+    private static final Function<{{simpleSourceName}}, {{simpleTargetName}}> {{uppercaseName}} =
+        new Function<{{simpleSourceName}}, {{simpleTargetName}}>() {
+
+            @Nullable
+            @Override
+            public {{simpleTargetName}} apply(@Nullable {{simpleSourceName}} input) {
+                return input == null ? null : input.{{name}}();
+            }
+
+        };
+    {{/functions}}
+    {{#predicates}}
+
+    private static final Predicate<{{simpleSourceName}}> {{uppercaseName}} =
+        new Predicate<{{simpleSourceName}}>() {
+
+            @Nullable
+            @Override
+            public boolean apply(@Nullable {{simpleSourceName}} input) {
+                return input != null && input.{{name}}();
+            }
+
+        };
+    {{/predicates}}
+
+    private {{simpleSourceName}}_() {
+
+    }
+    {{#functions}}
+
+    public static Function<{{simpleSourceName}}, {{simpleTargetName}}> {{name}}() {
+        return {{uppercaseName}};
+    }
+    {{/functions}}
+    {{#predicates}}
+
+    public static Predicate<{{simpleSourceName}}> {{name}}() {
+        return {{uppercaseName}};
+    }
+    {{/predicates}}
+
+}

@@ -1,16 +1,16 @@
 package com.codereligion.hammock;
 
 import com.codereligion.hammock.compiler.FunctionalCompiler;
-import com.codereligion.hammock.sample.InvalidUseOnNoArgumentStaticMethod;
-import com.codereligion.hammock.sample.InvalidUseOnSingleArgumentInstanceMethod;
-import com.codereligion.hammock.sample.InvalidUseOnTwoArgumentInstanceMethod;
-import com.codereligion.hammock.sample.InvalidUseOnTwoArgumentStaticMethod;
-import com.codereligion.hammock.sample.ValidUseOnAllInstanceMethods;
-import com.codereligion.hammock.sample.ValidUseOnAllStaticMethods;
-import com.codereligion.hammock.sample.ValidUseOnNoInstanceMethods;
-import com.codereligion.hammock.sample.ValidUseOnNoStaticMethods;
-import com.codereligion.hammock.sample.ValidUseOnSomeInstanceMethods;
-import com.codereligion.hammock.sample.ValidUseOnSomeStaticMethods;
+import com.codereligion.hammock.compiler.sample.InvalidUseOnNoArgumentStaticMethod;
+import com.codereligion.hammock.compiler.sample.InvalidUseOnSingleArgumentInstanceMethod;
+import com.codereligion.hammock.compiler.sample.InvalidUseOnTwoArgumentInstanceMethod;
+import com.codereligion.hammock.compiler.sample.InvalidUseOnTwoArgumentStaticMethod;
+import com.codereligion.hammock.compiler.sample.ValidUseOnAllInstanceMethods;
+import com.codereligion.hammock.compiler.sample.ValidUseOnAllStaticMethods;
+import com.codereligion.hammock.compiler.sample.ValidUseOnNoInstanceMethods;
+import com.codereligion.hammock.compiler.sample.ValidUseOnNoStaticMethods;
+import com.codereligion.hammock.compiler.sample.ValidUseOnSomeInstanceMethods;
+import com.codereligion.hammock.compiler.sample.ValidUseOnSomeStaticMethods;
 import org.junit.Test;
 
 import javax.annotation.processing.Processor;
@@ -54,7 +54,7 @@ public class FunctionalCompilerTest {
 
     @Test
     public void invalidUseOnTwoArgumentInstanceMethod() throws IOException {
-        assertThat(compilationOf(InvalidUseOnTwoArgumentInstanceMethod.class), failedAtLine(13));
+        assertThat(compilationOf(InvalidUseOnTwoArgumentInstanceMethod.class), failedAtLine(12));
     }
 
     @Test
