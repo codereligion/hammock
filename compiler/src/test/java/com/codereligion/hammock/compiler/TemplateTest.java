@@ -1,7 +1,7 @@
 package com.codereligion.hammock.compiler;
 
-import com.codereligion.hammock.compiler.example.Member;
-import com.codereligion.hammock.compiler.example.Member_;
+import com.codereligion.hammock.compiler.playground.Member;
+import com.codereligion.hammock.compiler.playground.Member_;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
@@ -9,7 +9,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.io.Files;
-import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
 import org.junit.Test;
@@ -17,11 +16,11 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class TemplateTest {
 
@@ -29,7 +28,7 @@ public class TemplateTest {
     public void test() throws IOException {
         final GeneratedClass generatedClass = new GeneratedClass();
 
-        generatedClass.setPackageName("com.codereligion.hammock.compiler.example");
+        generatedClass.setPackageName(Member.class.getPackage().getName());
         generatedClass.setSimpleSourceName(Member.class.getSimpleName());
 
         final GeneratedFunction getName = new GeneratedFunction();
@@ -38,11 +37,9 @@ public class TemplateTest {
         getName.setFullyQualifiedTargetName(String.class.getName());
         generatedClass.getMethods().add(getName);
 
-        final GeneratedFunction getLocation = new GeneratedFunction();
-        getLocation.setName("getLocation");
-        getLocation.setSimpleTargetName(String.class.getSimpleName());
-        getLocation.setFullyQualifiedTargetName(String.class.getName());
-        generatedClass.getMethods().add(getLocation);
+        final GeneratedPredicate isHappy = new GeneratedPredicate();
+        isHappy.setName("isHappy");
+        generatedClass.getMethods().add(isHappy);
 
         final MustacheFactory factory = new DefaultMustacheFactory();
         final Mustache mustache = factory.compile("templates/template.mustache");
@@ -53,16 +50,17 @@ public class TemplateTest {
         final String actual = writer.toString();
         final String path = Member_.class.getName().replace('.', '/') + ".java";
         final File file = new File("src/test/java", path);
-        final List<String> expected = Files.readLines(file, Charsets.UTF_8);
+        final String expected = Files.toString(file, Charsets.UTF_8);
 
-        Patch<String> patch = DiffUtils.diff(Splitter.on('\n').splitToList(actual), expected);
+        final Splitter splitter = Splitter.on('\n');
+        final List<String> lines = splitter.splitToList(expected);
+        final Patch<String> patch = DiffUtils.diff(lines, splitter.splitToList(actual));
 
         if (patch.getDeltas().isEmpty()) {
             return;
         }
-        
-        final List<String> list = DiffUtils.generateUnifiedDiff("Expected", "Actual", expected, patch, 0);
 
+        final List<String> list = DiffUtils.generateUnifiedDiff("Expected", "Actual", lines, patch, 0);
         throw new AssertionError('\n' + Joiner.on('\n').join(list));
     }
 

@@ -1,0 +1,11 @@
+    private enum {{camelCaseName}}
+        implements Predicate<{{simpleSourceName}}> {
+
+        INSTANCE;
+
+        @Override
+        public boolean apply(@Nullable {{simpleSourceName}} input) {
+            return input != null && input.{{name}}();
+        }
+
+    }

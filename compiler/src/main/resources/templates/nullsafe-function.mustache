@@ -1,0 +1,12 @@
+    private enum {{camelCaseName}}
+        implements Function<{{simpleSourceName}}, {{simpleTargetName}}> {
+
+        INSTANCE;
+
+        @Nullable
+        @Override
+        public {{simpleTargetName}} apply(@Nullable {{simpleSourceName}} input) {
+            return input == null ? null : input.{{name}}();
+        }
+
+    }

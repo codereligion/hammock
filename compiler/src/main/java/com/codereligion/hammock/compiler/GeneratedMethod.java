@@ -15,8 +15,8 @@ abstract class GeneratedMethod implements Comparable<GeneratedMethod> {
         this.name = name;
     }
 
-    public String getUppercaseName() {
-        return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, name);
+    public String getCamelCaseName() {
+        return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name);
     }
 
     @Override

@@ -5,6 +5,7 @@ subprojects {
     ext.packaging = 'jar'
 
     repositories {
+        mavenLocal()
         mavenCentral()
     }
 

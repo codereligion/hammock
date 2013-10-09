@@ -3,15 +3,14 @@ package {{packageName}};
 
 import {{.}};
 {{/imports}}
-{{#hasFunctions}}
 
+{{#hasFunctions}}
 import com.google.common.base.Function;
 {{/hasFunctions}}
 {{#hasPredicates}}
-
 import com.google.common.base.Predicate;
-{{/hasPredicates}}
 
+{{/hasPredicates}}
 import javax.annotation.Generated;
 import javax.annotation.Nullable;
 
@@ -19,29 +18,11 @@ import javax.annotation.Nullable;
 public final class {{simpleSourceName}}_ {
     {{#functions}}
 
-    private static final Function<{{simpleSourceName}}, {{simpleTargetName}}> {{uppercaseName}} =
-        new Function<{{simpleSourceName}}, {{simpleTargetName}}>() {
-
-            @Nullable
-            @Override
-            public {{simpleTargetName}} apply(@Nullable {{simpleSourceName}} input) {
-                return input == null ? null : input.{{name}}();
-            }
-
-        };
+{{> nullsafe-function}}
     {{/functions}}
     {{#predicates}}
 
-    private static final Predicate<{{simpleSourceName}}> {{uppercaseName}} =
-        new Predicate<{{simpleSourceName}}>() {
-
-            @Nullable
-            @Override
-            public boolean apply(@Nullable {{simpleSourceName}} input) {
-                return input != null && input.{{name}}();
-            }
-
-        };
+{{> nullsafe-predicate}}
     {{/predicates}}
 
     private {{simpleSourceName}}_() {
@@ -50,13 +31,13 @@ public final class {{simpleSourceName}}_ {
     {{#functions}}
 
     public static Function<{{simpleSourceName}}, {{simpleTargetName}}> {{name}}() {
-        return {{uppercaseName}};
+        return {{camelCaseName}}.INSTANCE;
     }
     {{/functions}}
     {{#predicates}}
 
     public static Predicate<{{simpleSourceName}}> {{name}}() {
-        return {{uppercaseName}};
+        return {{camelCaseName}}.INSTANCE;
     }
     {{/predicates}}
 
