@@ -1,24 +1,26 @@
 package com.codereligion.hammock.compiler;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
+import com.google.common.io.Resources;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic.Kind;
-import java.util.ArrayList;
+import javax.tools.JavaFileObject;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +30,7 @@ import static javax.lang.model.element.ElementKind.METHOD;
 public class FunctionalCompiler extends AbstractProcessor {
 
     private final Set<ElementKind> supported = Sets.immutableEnumSet(
-        METHOD
+            METHOD
     );
 
     @Override
@@ -46,87 +48,78 @@ public class FunctionalCompiler extends AbstractProcessor {
         return true;
     }
 
-    private void check(ExecutableElement method) {
-        final Set<Modifier> modifiers = method.getModifiers();
-        final List<? extends VariableElement> parameters = method.getParameters();
-
-        if (modifiers.contains(Modifier.STATIC)) {
-            switch (parameters.size()) {
-                case 0: {
-                    error(method, "not enough arguments");
-                    break;
-                }
-                case 1: {
-                    break;
-                }
-                default: {
-                    error(method, "too many arguments");
-                }
-            }
-        } else {
-            switch (parameters.size()) {
-                case 0: {
-                    break;
-                }
-                default: {
-                    error(method, "too many arguments");
-                }
-            }
-        }
-    }
-
     private void parse(Element element) {
         final ExecutableElement method = (ExecutableElement) element;
 
         check(method);
 
         final Types types = processingEnv.getTypeUtils();
-        final List<? extends VariableElement> parameters = method.getParameters();
+
+        final TypeElement classElement = (TypeElement) element.getEnclosingElement();
+        final PackageElement packageElement = (PackageElement) classElement.getEnclosingElement();
+
+        final GeneratedClass generatedClass = new GeneratedClass();
+        final String className = classElement.getSimpleName().toString();
+
+        generatedClass.setPackageName(packageElement.getQualifiedName().toString());
+        generatedClass.setSimpleSourceName(className);
+
         final Element returnType = types.asElement(method.getReturnType());
-        final String name = method.getSimpleName().toString();
 
-        final String visibility = getVisibility(method);
+        final GeneratedMethod generatedMethod;
 
-        final Function<VariableElement, String> function = new Function<VariableElement, String>() {
+        if (returnType.asType().getKind() == TypeKind.BOOLEAN) {
+            generatedMethod = new GeneratedPredicate();
+        } else {
+            GeneratedFunction function = new GeneratedFunction();
+            function.setSimpleTargetName(returnType.getSimpleName().toString());
+            function.setFullyQualifiedTargetName(((PackageElement) returnType.getEnclosingElement()).getQualifiedName().toString());
+            generatedMethod = function;
+        }
 
-            @Override
-            public String apply(VariableElement input) {
-                final Name type = types.asElement(input.asType()).getSimpleName();
-                final Name name = input.getSimpleName();
-                return type + " " + name;
+        generatedMethod.setName(method.getSimpleName().toString());
+        generatedClass.getMethods().add(generatedMethod);
+
+        final Thread thread = Thread.currentThread();
+        final ClassLoader original = thread.getContextClassLoader();
+        
+        try {
+            final ClassLoader loader = FunctionalCompiler.class.getClassLoader();
+            thread.setContextClassLoader(loader);
+
+            final MustacheFactory factory = new DefaultMustacheFactory();
+            final Mustache mustache = factory.compile("templates/template.mustache");
+
+            try {
+                final Filer filer = processingEnv.getFiler();
+                final JavaFileObject file = filer.createSourceFile(classElement.getQualifiedName() + "_", element);
+
+                try (Writer writer = file.openWriter()) {
+                    mustache.execute(writer, generatedClass).flush();
+                }
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e);
             }
-
-        };
-
-        final Joiner joiner = Joiner.on(' ');
-        final String params = joiner.join(Iterables.transform(parameters, function));
-
-        final List<String> signature = new ArrayList<>();
-
-        if (!visibility.isEmpty()) {
-            signature.add(visibility);
+        } finally {
+            thread.setContextClassLoader(original);
         }
-
-        if (method.getModifiers().contains(Modifier.STATIC)) {
-            signature.add("static");
-        }
-
-        signature.add(returnType.getSimpleName().toString());
-        signature.add(name + "(" + params + ")");
-
-        System.out.println(method.getEnclosingElement());
-        System.out.println(joiner.join(signature));
     }
 
-    private String getVisibility(ExecutableElement method) {
-        if (method.getModifiers().contains(Modifier.PRIVATE)) {
-            return "private";
-        } else if (method.getModifiers().contains(Modifier.PROTECTED)) {
-            return "protected";
-        } else if (method.getModifiers().contains(Modifier.PUBLIC)) {
-            return "public";
+    private void check(ExecutableElement method) {
+        final Set<Modifier> modifiers = method.getModifiers();
+        final List<? extends VariableElement> parameters = method.getParameters();
+
+        if (modifiers.contains(Modifier.STATIC)) {
+            error(method, "static not supported");
         } else {
-            return "";
+            switch (parameters.size()) {
+                case 0: {
+                    break;
+                }
+                default: {
+                    error(method, "too many arguments");
+                }
+            }
         }
     }
 

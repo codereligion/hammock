@@ -1,11 +1,14 @@
-package com.codereligion.hammock.compiler.sample;
+package com.codereligion.hammock.sample;
 
-public class ValidUseOnNoInstanceMethods {
+import com.codereligion.hammock.Functional;
+
+public class ValidUseOnAllInstanceMethods {
 
     private String first;
     private String second;
     private String third;
 
+    @Functional
     public String getFirst() {
         return first;
     }
@@ -14,6 +17,7 @@ public class ValidUseOnNoInstanceMethods {
         this.first = first;
     }
 
+    @Functional
     public String getSecond() {
         return second;
     }
@@ -22,6 +26,7 @@ public class ValidUseOnNoInstanceMethods {
         this.second = second;
     }
 
+    @Functional
     public String getThird() {
         return third;
     }
