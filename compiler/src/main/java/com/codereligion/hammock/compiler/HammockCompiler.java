@@ -12,6 +12,9 @@ import com.codereligion.hammock.compiler.model.simple.StringName;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Sets;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -26,13 +29,13 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
-import javax.lang.model.util.Types;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import static javax.lang.model.element.ElementKind.METHOD;
 
@@ -45,15 +48,30 @@ public class HammockCompiler extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        for (TypeElement annotation : annotations) {
+        boolean claimed = false;
 
+        final LoadingCache<TypeElement, Type> cache = CacheBuilder.newBuilder().build(new CacheLoader<TypeElement, Type>() {
+
+            @Override
+            public Type load(TypeElement typeElement) throws Exception {
+                return new SimpleType(new StringName(typeElement.getQualifiedName() + "_"));
+            }
+
+        });
+
+        for (TypeElement annotation : annotations) {
             for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
                 if (supported.contains(element.getKind())) {
                     final ExecutableElement method = (ExecutableElement) element;
+                    final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
 
                     if (check(method)) {
-                        parse(method);
-                        return true;
+                        try {
+                            parse(method, cache.get(typeElement));
+                        } catch (ExecutionException e) {
+                            throw new IllegalStateException(e);
+                        }
+                        claimed = true;
                     }
                 } else {
                     error(element, element.getKind() + " is not supported");
@@ -61,7 +79,37 @@ public class HammockCompiler extends AbstractProcessor {
             }
         }
 
-        return false;
+        for (Type type : cache.asMap().values()) {
+            write(type);
+        }
+
+        return claimed;
+    }
+
+    private void write(Type type) {
+        final Thread thread = Thread.currentThread();
+        final ClassLoader original = thread.getContextClassLoader();
+
+        try {
+            final ClassLoader loader = HammockCompiler.class.getClassLoader();
+            thread.setContextClassLoader(loader);
+
+            final MustacheFactory factory = new DefaultMustacheFactory();
+            final Mustache mustache = factory.compile("templates/template.mustache");
+
+            try {
+                final Filer filer = processingEnv.getFiler();
+                final JavaFileObject file = filer.createSourceFile(type.getName().getQualified());
+
+                try (Writer writer = file.openWriter()) {
+                    mustache.execute(writer, type).flush();
+                }
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e);
+            }
+        } finally {
+            thread.setContextClassLoader(original);
+        }
     }
 
     private boolean check(ExecutableElement method) {
@@ -86,19 +134,14 @@ public class HammockCompiler extends AbstractProcessor {
         return true;
     }
 
-    private void parse(ExecutableElement method) {
-        final Types types = processingEnv.getTypeUtils();
-
-        final TypeElement classElement = (TypeElement) method.getEnclosingElement();
+    private void parse(ExecutableElement method, Type type) {
+        final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
 
         final Functional functional = method.getAnnotation(Functional.class);
-        final Type type = new SimpleType(new StringName(classElement.getQualifiedName() + "_"));
-
+        final ClosureName name = new StringClosureName(method.getSimpleName().toString());
+        final Name parameterType = new StringName(typeElement.getQualifiedName().toString());
 
         final Closure closure;
-        final ClosureName name = new StringClosureName(method.getSimpleName().toString());
-        final Name parameterType = new StringName(classElement.getQualifiedName().toString());
-
         if (method.getReturnType().getKind() == TypeKind.BOOLEAN) {
             closure = new BaseClosure(name, parameterType, functional.nullsafe());
         } else {
@@ -107,30 +150,6 @@ public class HammockCompiler extends AbstractProcessor {
         }
 
         type.getClosures().add(closure);
-
-        final Thread thread = Thread.currentThread();
-        final ClassLoader original = thread.getContextClassLoader();
-
-        try {
-            final ClassLoader loader = HammockCompiler.class.getClassLoader();
-            thread.setContextClassLoader(loader);
-
-            final MustacheFactory factory = new DefaultMustacheFactory();
-            final Mustache mustache = factory.compile("templates/template.mustache");
-
-            try {
-                final Filer filer = processingEnv.getFiler();
-                final JavaFileObject file = filer.createSourceFile(type.getName().getQualified(), method);
-
-                try (Writer writer = file.openWriter()) {
-                    mustache.execute(writer, type).flush();
-                }
-            } catch (IOException e) {
-                throw new IllegalArgumentException(e);
-            }
-        } finally {
-            thread.setContextClassLoader(original);
-        }
     }
 
     private void error(Element element, String message) {
