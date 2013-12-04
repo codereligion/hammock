@@ -28,7 +28,7 @@ subprojects {
     }
 
     tasks.withType(JavaCompile) {
-        options.compilerArgs = ['-Werror', '-Xlint']
+        options.compilerArgs = ['-Werror', '-Xlint:-processing']
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {

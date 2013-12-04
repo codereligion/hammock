@@ -1,44 +1,71 @@
-package {{packageName}};
-{{#imports}}
+package {{package}};
 
+{{#imports}}
 import {{.}};
 {{/imports}}
 
-{{#hasFunctions}}
-import com.google.common.base.Function;
-{{/hasFunctions}}
-{{#hasPredicates}}
-import com.google.common.base.Predicate;
+@Generated("com.codereligion.hammock.compiler.HammockCompiler")
+public final class {{name.simple}} {
+{{#closures}}
 
-{{/hasPredicates}}
-import javax.annotation.Generated;
-import javax.annotation.Nullable;
+    private enum {{name.toUpperCamel}}
+    {{#predicate}}
+        implements Predicate<{{parameterType.simple}}> {
+    {{/predicate}}
+    {{^predicate}}
+        implements Function<{{parameterType.simple}}, {{returnType.simple}}> {
+    {{/predicate}}
 
-@Generated("com.codereligion.hammock.compiler.FunctionalCompiler")
-public final class {{simpleSourceName}}_ {
-    {{#functions}}
+        INSTANCE;
 
-{{> nullsafe-function}}
-    {{/functions}}
-    {{#predicates}}
-
-{{> nullsafe-predicate}}
-    {{/predicates}}
-
-    private {{simpleSourceName}}_() {
+    {{#predicate}}
+        @Override
+        {{#nullsafe}}
+        public boolean apply(@Nullable {{parameterType.simple}} input) {
+            return input != null && input.{{name.toLowerCamel}}();
+        }
+        {{/nullsafe}}
+        {{^nullsafe}}
+        public boolean apply({{parameterType.simple}} input) {
+            Preconditions.checkNotNull(input, "{{parameterType.simple}}");
+            return input.{{name.toLowerCamel}}();
+        }
+        {{/nullsafe}}
+    {{/predicate}}
+    {{^predicate}}
+        @Nullable
+        @Override
+        {{#nullsafe}}
+        public {{returnType.simple}} apply(@Nullable {{parameterType.simple}} input) {
+            return input == null ? null : input.{{name.toLowerCamel}}();
+        }
+        {{/nullsafe}}
+        {{^nullsafe}}
+        public {{returnType.simple}} apply({{parameterType.simple}} input) {
+            Preconditions.checkNotNull(input, "{{parameterType.simple}}");
+            return input.{{name.toLowerCamel}}();
+        }
+        {{/nullsafe}}
+    {{/predicate}}
 
     }
-    {{#functions}}
+{{/closures}}
 
-    public static Function<{{simpleSourceName}}, {{simpleTargetName}}> {{name}}() {
-        return {{camelCaseName}}.INSTANCE;
-    }
-    {{/functions}}
-    {{#predicates}}
+    private {{name.simple}}() {
 
-    public static Predicate<{{simpleSourceName}}> {{name}}() {
-        return {{camelCaseName}}.INSTANCE;
     }
-    {{/predicates}}
+{{#closures}}
+
+    {{#predicate}}
+    public static Predicate<{{parameterType.simple}}> {{name.toLowerCamel}}() {
+        return {{name.toUpperCamel}}.INSTANCE;
+    }
+    {{/predicate}}
+    {{^predicate}}
+    public static Function<{{parameterType.simple}}, {{returnType.simple}}> {{name.toLowerCamel}}() {
+        return {{name.toUpperCamel}}.INSTANCE;
+    }
+    {{/predicate}}
+{{/closures}}
 
 }

@@ -3,22 +3,24 @@ package com.codereligion.hammock.compiler.playground;
 public class Member {
 
     private String name;
+    private String nickName;
     private boolean happy;
+    private boolean active;
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getNickName() {
+        return nickName;
     }
 
     public boolean isHappy() {
         return happy;
     }
 
-    public void setHappy(boolean happy) {
-        this.happy = happy;
+    public boolean isActive() {
+        return active;
     }
-    
+
 }
