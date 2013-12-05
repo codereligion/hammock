@@ -10,10 +10,14 @@
 
     <groupId>com.codereligion</groupId>
     <artifactId>hammock-parent</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
     <packaging>pom</packaging>
 
     <name>Hammock</name>
+    <description>
+        An annotation processor/code generator to simplify working with Guava's functional style APIs
+    </description>
+    <url>https://github.com/whiskeysierra/hammock</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,9 +32,9 @@
     </licenses>
 
     <scm>
-        <url>scm:git@github.com:whiskeysierra/hammock.git</url>
-        <connection>scm:git@github.com:whiskeysierra/hammock.git</connection>
-        <developerConnection>scm:git@github.com:whiskeysierra/hammock.git</developerConnection>
+        <url>scm:git:git@github.com:whiskeysierra/hammock.git</url>
+        <connection>scm:git:git@github.com:whiskeysierra/hammock.git</connection>
+        <developerConnection>scm:git:git@github.com:whiskeysierra/hammock.git</developerConnection>
     </scm>
 
     <developers>
@@ -53,6 +57,46 @@
                         <arg>-Werror</arg>
                     </compilerArgs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
