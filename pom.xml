@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <groupId>com.codereligion</groupId>
+    <artifactId>hammock-parent</artifactId>
+    <version>0.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Hammock</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>http://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>scm:git@github.com:whiskeysierra/hammock.git</url>
+        <connection>scm:git@github.com:whiskeysierra/hammock.git</connection>
+        <developerConnection>scm:git@github.com:whiskeysierra/hammock.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>whiskeysierra</id>
+            <name>Willi Schönborn</name>
+        </developer>
+    </developers>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <compilerArgs>
+                        <arg>-Werror</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <modules>
+        <module>api</module>
+        <module>compiler</module>
+        <module>tests</module>
+    </modules>
+
+</project>
