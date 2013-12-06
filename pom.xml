@@ -10,7 +10,7 @@
 
     <groupId>com.codereligion</groupId>
     <artifactId>hammock-parent</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
     <packaging>pom</packaging>
 
     <name>Hammock</name>
@@ -19,10 +19,14 @@
     </description>
     <url>https://github.com/whiskeysierra/hammock</url>
 
+    <prerequisites>
+        <maven>3.0.5</maven>
+    </prerequisites>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
+    
     <licenses>
         <license>
             <name>The MIT License (MIT)</name>
@@ -84,6 +88,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -92,7 +104,7 @@
         <module>compiler</module>
         <module>tests</module>
     </modules>
-    
+
     <profiles>
         <profile>
             <id>release</id>
@@ -111,6 +123,18 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.5.1</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>sonatype-nexus-staging</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <stagingProfileId>12f9f40fc6e624</stagingProfileId>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
