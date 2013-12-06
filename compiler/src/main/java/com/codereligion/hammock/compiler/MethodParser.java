@@ -28,13 +28,19 @@ public class MethodParser implements Parser {
         final boolean isStatic = modifiers.contains(Modifier.STATIC);
         
         if (isStatic) {
-            throw new UnsupportedUsageException(method, "static not supported");
-        }
+            if (parameters.isEmpty()) {
+                throw new UnsupportedUsageException(method, "static few arguments");
+            }
+            
+            if (parameters.size() > 1) {
+                throw new UnsupportedUsageException(method, "too many arguments");
+            }
+        } else {
+            final boolean hasParameters = !parameters.isEmpty();
 
-        final boolean hasParameters = !parameters.isEmpty();
-        
-        if (hasParameters) {
-            throw new UnsupportedUsageException(method, "too many arguments");
+            if (hasParameters) {
+                throw new UnsupportedUsageException(method, "too many arguments");
+            }
         }
 
         final boolean returnsVoid = method.getReturnType().getKind() == TypeKind.VOID;
@@ -51,14 +57,24 @@ public class MethodParser implements Parser {
 
         final FirstClass annotation = method.getAnnotation(FirstClass.class);
         final ClosureName name = new ClosureName(method.getSimpleName().toString());
-        final Name parameterType = new Name(typeElement.getQualifiedName().toString());
+        final boolean isStatic = method.getModifiers().contains(Modifier.STATIC);
+        
+        final Name parameterType;
+        
+        if (isStatic) {
+            final VariableElement firstParameter = method.getParameters().get(0);
+            parameterType = new Name(firstParameter.asType().toString());
+        } else {
+            parameterType = new Name(typeElement.getQualifiedName().toString());
+        }
 
         final Closure closure;
+        
         if (method.getReturnType().getKind() == TypeKind.BOOLEAN) {
-            closure = new Closure(name, parameterType, annotation.nullsafe());
+            closure = new Closure(name, parameterType, isStatic, annotation.nullsafe());
         } else {
             final Name returnType = new Name(method.getReturnType().toString());
-            closure = new Closure(name, parameterType, returnType, annotation.nullsafe());
+            closure = new Closure(name, parameterType, returnType, isStatic, annotation.nullsafe());
         }
 
         final Type type = storage.apply(typeElement);

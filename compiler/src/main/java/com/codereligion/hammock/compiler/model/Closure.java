@@ -7,17 +7,19 @@ public final class Closure {
     private final ClosureName name;
     private final Name parameterType;
     private final Name returnType;
+    private final boolean isStatic;
     private final boolean nullsafe;
 
-    public Closure(ClosureName name, Name parameterType, Name returnType, boolean nullsafe) {
+    public Closure(ClosureName name, Name parameterType, Name returnType, boolean isStatic, boolean nullsafe) {
         this.name = name;
         this.parameterType = parameterType;
         this.returnType = returnType;
+        this.isStatic = isStatic;
         this.nullsafe = nullsafe;
     }
 
-    public Closure(ClosureName name, Name parameterType, boolean nullsafe) {
-        this(name, parameterType, BOOLEAN, nullsafe);
+    public Closure(ClosureName name, Name parameterType, boolean isStatic, boolean nullsafe) {
+        this(name, parameterType, BOOLEAN, isStatic, nullsafe);
     }
 
     public final ClosureName getName() {
@@ -34,6 +36,10 @@ public final class Closure {
 
     public final Name getReturnType() {
         return returnType;
+    }
+
+    public boolean isStatic() {
+        return isStatic;
     }
 
     public boolean isNullsafe() {

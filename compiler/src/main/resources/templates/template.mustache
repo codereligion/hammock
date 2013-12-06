@@ -1,19 +1,19 @@
-package {{package}};
+package {{{package}}};
 
 {{#imports}}
-import {{.}};
+import {{{.}}};
 {{/imports}}
 
 @Generated("com.codereligion.hammock.compiler.FirstClassCompiler")
-public final class {{name.simple}} {
+public final class {{{name.simple}}} {
 {{#closures}}
 
-    private enum {{name.toUpperCamel}}
+    private enum {{{name.toUpperCamel}}}
     {{#predicate}}
-        implements Predicate<{{parameterType.simple}}> {
+        implements Predicate<{{{parameterType.simple}}}> {
     {{/predicate}}
     {{^predicate}}
-        implements Function<{{parameterType.simple}}, {{returnType.simple}}> {
+        implements Function<{{{parameterType.simple}}}, {{{returnType.simple}}}> {
     {{/predicate}}
 
         INSTANCE;
@@ -21,14 +21,14 @@ public final class {{name.simple}} {
     {{#predicate}}
         @Override
         {{#nullsafe}}
-        public boolean apply(@Nullable {{parameterType.simple}} input) {
-            return input != null && input.{{name.toLowerCamel}}();
+        public boolean apply(@Nullable {{{parameterType.simple}}} input) {
+            return input != null && input.{{{name.toLowerCamel}}}();
         }
         {{/nullsafe}}
         {{^nullsafe}}
-        public boolean apply({{parameterType.simple}} input) {
-            Preconditions.checkNotNull(input, "{{parameterType.simple}}");
-            return input.{{name.toLowerCamel}}();
+        public boolean apply({{{parameterType.simple}}} input) {
+            Preconditions.checkNotNull(input, "{{{parameterType.simple}}}");
+            return input.{{{name.toLowerCamel}}}();
         }
         {{/nullsafe}}
     {{/predicate}}
@@ -36,14 +36,14 @@ public final class {{name.simple}} {
         @Nullable
         @Override
         {{#nullsafe}}
-        public {{returnType.simple}} apply(@Nullable {{parameterType.simple}} input) {
-            return input == null ? null : input.{{name.toLowerCamel}}();
+        public {{{returnType.simple}}} apply(@Nullable {{{parameterType.simple}}} input) {
+            return input == null ? null : input.{{{name.toLowerCamel}}}();
         }
         {{/nullsafe}}
         {{^nullsafe}}
-        public {{returnType.simple}} apply({{parameterType.simple}} input) {
-            Preconditions.checkNotNull(input, "{{parameterType.simple}}");
-            return input.{{name.toLowerCamel}}();
+        public {{{returnType.simple}}} apply({{{parameterType.simple}}} input) {
+            Preconditions.checkNotNull(input, "{{{parameterType.simple}}}");
+            return input.{{{name.toLowerCamel}}}();
         }
         {{/nullsafe}}
     {{/predicate}}
@@ -51,19 +51,19 @@ public final class {{name.simple}} {
     }
 {{/closures}}
 
-    private {{name.simple}}() {
+    private {{{name.simple}}}() {
 
     }
 {{#closures}}
 
     {{#predicate}}
-    public static Predicate<{{parameterType.simple}}> {{name.toLowerCamel}}() {
-        return {{name.toUpperCamel}}.INSTANCE;
+    public static Predicate<{{{parameterType.simple}}}> {{{name.toLowerCamel}}}() {
+        return {{{name.toUpperCamel}}}.INSTANCE;
     }
     {{/predicate}}
     {{^predicate}}
-    public static Function<{{parameterType.simple}}, {{returnType.simple}}> {{name.toLowerCamel}}() {
-        return {{name.toUpperCamel}}.INSTANCE;
+    public static Function<{{{parameterType.simple}}}, {{{returnType.simple}}}> {{{name.toLowerCamel}}}() {
+        return {{{name.toUpperCamel}}}.INSTANCE;
     }
     {{/predicate}}
 {{/closures}}
