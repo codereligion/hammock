@@ -49,7 +49,7 @@ public final class Member {
 
     ...
     
-    @Functional
+    @FirstClass
     public String getName() {
         return this.name;
     }
