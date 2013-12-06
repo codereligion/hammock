@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface FirstClass {
 
-    String value() default "";
+    String name() default "";
     
     boolean nullsafe() default true;
 

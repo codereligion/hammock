@@ -10,7 +10,7 @@
 
     <groupId>com.codereligion</groupId>
     <artifactId>hammock-parent</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
     <packaging>pom</packaging>
 
     <name>Hammock</name>

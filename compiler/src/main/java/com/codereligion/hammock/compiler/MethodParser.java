@@ -118,10 +118,10 @@ public class MethodParser implements Parser {
 
         final ClosureName name;
         
-        if (annotation.value().isEmpty()) {
+        if (annotation.name().isEmpty()) {
             name = delegate;
         } else {
-            name = new ClosureName(annotation.value());
+            name = new ClosureName(annotation.name());
         }
         
         final boolean isStatic = method.getModifiers().contains(Modifier.STATIC);
