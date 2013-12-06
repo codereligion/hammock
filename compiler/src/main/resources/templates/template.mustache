@@ -22,13 +22,13 @@ public final class {{{name.simple}}} {
         @Override
         {{#nullsafe}}
         public boolean apply(@Nullable {{{parameterType.simple}}} input) {
-            return input != null && input.{{{name.toLowerCamel}}}();
+            return input != null && input.{{{delegate.toLowerCamel}}}();
         }
         {{/nullsafe}}
         {{^nullsafe}}
         public boolean apply({{{parameterType.simple}}} input) {
             Preconditions.checkNotNull(input, "{{{parameterType.simple}}}");
-            return input.{{{name.toLowerCamel}}}();
+            return input.{{{delegate.toLowerCamel}}}();
         }
         {{/nullsafe}}
     {{/predicate}}
@@ -37,13 +37,13 @@ public final class {{{name.simple}}} {
         @Override
         {{#nullsafe}}
         public {{{returnType.simple}}} apply(@Nullable {{{parameterType.simple}}} input) {
-            return input == null ? null : input.{{{name.toLowerCamel}}}();
+            return input == null ? null : input.{{{delegate.toLowerCamel}}}();
         }
         {{/nullsafe}}
         {{^nullsafe}}
         public {{{returnType.simple}}} apply({{{parameterType.simple}}} input) {
             Preconditions.checkNotNull(input, "{{{parameterType.simple}}}");
-            return input.{{{name.toLowerCamel}}}();
+            return input.{{{delegate.toLowerCamel}}}();
         }
         {{/nullsafe}}
     {{/predicate}}

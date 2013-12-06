@@ -9,7 +9,7 @@ public class Member {
     private boolean happy;
     private boolean active;
 
-    @FirstClass
+    @FirstClass("toName")
     public String getName() {
         return name;
     }

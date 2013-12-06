@@ -54,7 +54,7 @@ public class MethodParser implements Parser {
         }
 
         final boolean isObjectMethod = isObjectMethod(method, parameters);
-        
+
         if (isObjectMethod) {
             throw new UnsupportedUsageException(method, "can't use Object methods");
         }
@@ -80,15 +80,15 @@ public class MethodParser implements Parser {
             if (isDifferentNumberOfArguments) {
                 continue;
             }
-            
+
             final ImmutableList<Parameter> invokableParameters = invokable.getParameters();
             final boolean typesMatch = typesMatch(parameters, invokableParameters);
-            
+
             if (typesMatch) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -98,14 +98,14 @@ public class MethodParser implements Parser {
             final Parameter right = invokableParameters.get(i);
 
             final boolean typesMatch = left.asType().toString().equals(right.getClass().getName());
-            
+
             if (typesMatch) {
                 continue;
             }
-            
+
             return false;
         }
-        
+
         return true;
     }
 
@@ -113,9 +113,17 @@ public class MethodParser implements Parser {
     public void parse(Element element, Function<TypeElement, Type> storage) {
         final ExecutableElement method = (ExecutableElement) element;
         final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
-
         final FirstClass annotation = method.getAnnotation(FirstClass.class);
-        final ClosureName name = new ClosureName(method.getSimpleName().toString());
+        final ClosureName delegate = new ClosureName(method.getSimpleName().toString());;
+
+        final ClosureName name;
+        
+        if (annotation.value().isEmpty()) {
+            name = delegate;
+        } else {
+            name = new ClosureName(annotation.value());
+        }
+        
         final boolean isStatic = method.getModifiers().contains(Modifier.STATIC);
 
         final Name parameterType;
@@ -130,10 +138,10 @@ public class MethodParser implements Parser {
         final Closure closure;
 
         if (method.getReturnType().getKind() == TypeKind.BOOLEAN) {
-            closure = new Closure(name, parameterType, isStatic, annotation.nullsafe());
+            closure = new Closure(name, delegate, parameterType, isStatic, annotation.nullsafe());
         } else {
             final Name returnType = new Name(method.getReturnType().toString());
-            closure = new Closure(name, parameterType, returnType, isStatic, annotation.nullsafe());
+            closure = new Closure(name, delegate, parameterType, returnType, isStatic, annotation.nullsafe());
         }
 
         final Type type = storage.apply(typeElement);
