@@ -8,9 +8,12 @@ import com.codereligion.hammock.compiler.model.Type;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableMap;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -29,11 +32,18 @@ import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import static com.google.common.collect.ImmutableMap.Builder;
+
 @SupportedAnnotationTypes("com.codereligion.hammock.FirstClass")
 public class FirstClassCompiler extends AbstractProcessor {
+
+    private final Map<ElementKind, Parser> parsers = ImmutableMap.<ElementKind, Parser>of(
+        ElementKind.METHOD, new MethodParser()
+    );
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -50,28 +60,10 @@ public class FirstClassCompiler extends AbstractProcessor {
 
         for (TypeElement annotation : annotations) {
             for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
-                final ElementKind kind;
-
                 try {
-                    kind = parseAndCheck(element);
+                    parse(element, cache);
                 } catch (UnsupportedUsageException e) {
                     error(e.getElement(), e.getMessage());
-                    continue;
-                }
-
-                switch (kind) {
-                    case METHOD:
-                        final ExecutableElement method = (ExecutableElement) element;
-                        final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
-
-                        try {
-                            parse(method, cache.get(typeElement));
-                        } catch (ExecutionException e) {
-                            throw new IllegalStateException(e);
-                        }
-
-                        claimed = true;
-                        break;
                 }
             }
         }
@@ -83,37 +75,17 @@ public class FirstClassCompiler extends AbstractProcessor {
         return claimed;
     }
 
-    private ElementKind parseAndCheck(Element element) throws UnsupportedUsageException {
+    private void parse(Element element, Function<TypeElement, Type> storage) throws UnsupportedUsageException {
         final ElementKind kind = element.getKind();
 
-        switch (kind) {
-            case METHOD:
-                final ExecutableElement method = (ExecutableElement) element;
-                final Set<Modifier> modifiers = method.getModifiers();
-                final List<? extends VariableElement> parameters = method.getParameters();
+        final Parser parser = parsers.get(kind);
 
-                final boolean isStatic = modifiers.contains(Modifier.STATIC);
-                
-                if (isStatic) {
-                    throw new UnsupportedUsageException(method, "static not supported");
-                }
-
-                final boolean hasParameters = !parameters.isEmpty();
-                
-                if (hasParameters) {
-                    throw new UnsupportedUsageException(method, "too many arguments");
-                }
-
-                final boolean returnsVoid = method.getReturnType().getKind() == TypeKind.VOID;
-                
-                if (returnsVoid) {
-                    throw new UnsupportedUsageException(method, "Void methods are not supported");
-                }
-
-                return kind;
-            default:
-                throw new UnsupportedUsageException(element, "unsupported usage");
+        if (parser == null) {
+            throw new UnsupportedUsageException(element, "unsupported usage");
         }
+
+        parser.check(element);
+        parser.parse(element, storage);
     }
 
     private void write(Type type) {
@@ -140,24 +112,6 @@ public class FirstClassCompiler extends AbstractProcessor {
         } finally {
             thread.setContextClassLoader(original);
         }
-    }
-
-    private void parse(ExecutableElement method, Type type) {
-        final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
-
-        final FirstClass annotation = method.getAnnotation(FirstClass.class);
-        final ClosureName name = new ClosureName(method.getSimpleName().toString());
-        final Name parameterType = new Name(typeElement.getQualifiedName().toString());
-
-        final Closure closure;
-        if (method.getReturnType().getKind() == TypeKind.BOOLEAN) {
-            closure = new Closure(name, parameterType, annotation.nullsafe());
-        } else {
-            final Name returnType = new Name(method.getReturnType().toString());
-            closure = new Closure(name, parameterType, returnType, annotation.nullsafe());
-        }
-
-        type.getClosures().add(closure);
     }
 
     private void error(Element element, String message) {
