@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
-public @interface Functional {
+public @interface FirstClass {
 
     boolean nullsafe() default true;
 

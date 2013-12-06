@@ -43,7 +43,7 @@ using maven. The only runtime dependency is Guava.
 
 The first step is to annotate the methods you want to use:
 ```java
-import com.codereligion.hammock.Functional;
+import com.codereligion.hammock.FirstClass;
 
 public final class Member {
 

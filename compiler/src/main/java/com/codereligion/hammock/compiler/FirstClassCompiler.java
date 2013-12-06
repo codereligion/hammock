@@ -1,6 +1,6 @@
 package com.codereligion.hammock.compiler;
 
-import com.codereligion.hammock.Functional;
+import com.codereligion.hammock.FirstClass;
 import com.codereligion.hammock.compiler.model.api.Closure;
 import com.codereligion.hammock.compiler.model.api.ClosureName;
 import com.codereligion.hammock.compiler.model.api.Name;
@@ -39,8 +39,8 @@ import java.util.concurrent.ExecutionException;
 
 import static javax.lang.model.element.ElementKind.METHOD;
 
-@SupportedAnnotationTypes("com.codereligion.hammock.Functional")
-public class HammockCompiler extends AbstractProcessor {
+@SupportedAnnotationTypes("com.codereligion.hammock.FirstClass")
+public class FirstClassCompiler extends AbstractProcessor {
 
     private final Set<ElementKind> supported = Sets.immutableEnumSet(
             METHOD
@@ -91,7 +91,7 @@ public class HammockCompiler extends AbstractProcessor {
         final ClassLoader original = thread.getContextClassLoader();
 
         try {
-            final ClassLoader loader = HammockCompiler.class.getClassLoader();
+            final ClassLoader loader = FirstClassCompiler.class.getClassLoader();
             thread.setContextClassLoader(loader);
 
             final MustacheFactory factory = new DefaultMustacheFactory();
@@ -137,16 +137,16 @@ public class HammockCompiler extends AbstractProcessor {
     private void parse(ExecutableElement method, Type type) {
         final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
 
-        final Functional functional = method.getAnnotation(Functional.class);
+        final FirstClass firstClass = method.getAnnotation(FirstClass.class);
         final ClosureName name = new StringClosureName(method.getSimpleName().toString());
         final Name parameterType = new StringName(typeElement.getQualifiedName().toString());
 
         final Closure closure;
         if (method.getReturnType().getKind() == TypeKind.BOOLEAN) {
-            closure = new BaseClosure(name, parameterType, functional.nullsafe());
+            closure = new BaseClosure(name, parameterType, firstClass.nullsafe());
         } else {
             final Name returnType = new StringName(method.getReturnType().toString());
-            closure = new BaseClosure(name, parameterType, returnType, functional.nullsafe());
+            closure = new BaseClosure(name, parameterType, returnType, firstClass.nullsafe());
         }
 
         type.getClosures().add(closure);

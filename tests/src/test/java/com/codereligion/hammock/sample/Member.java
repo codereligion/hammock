@@ -1,6 +1,6 @@
 package com.codereligion.hammock.sample;
 
-import com.codereligion.hammock.Functional;
+import com.codereligion.hammock.FirstClass;
 
 public class Member {
 
@@ -9,7 +9,7 @@ public class Member {
     private boolean happy;
     private boolean active;
 
-    @Functional
+    @FirstClass
     public String getName() {
         return name;
     }
@@ -18,7 +18,7 @@ public class Member {
         this.name = name;
     }
 
-    @Functional(nullsafe = false)
+    @FirstClass(nullsafe = false)
     public String getNickName() {
         return nickName;
     }
@@ -27,7 +27,7 @@ public class Member {
         this.nickName = nickName;
     }
 
-    @Functional
+    @FirstClass
     public boolean isHappy() {
         return happy;
     }
@@ -36,7 +36,7 @@ public class Member {
         this.happy = happy;
     }
 
-    @Functional
+    @FirstClass
     public boolean isActive() {
         return active;
     }
