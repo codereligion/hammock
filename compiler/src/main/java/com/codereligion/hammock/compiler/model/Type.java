@@ -1,13 +1,8 @@
-package com.codereligion.hammock.compiler.model.simple;
+package com.codereligion.hammock.compiler.model;
 
-import com.codereligion.hammock.compiler.model.api.Closure;
-import com.codereligion.hammock.compiler.model.api.Name;
-import com.codereligion.hammock.compiler.model.api.Type;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.ImmutableSet;
 
 import javax.annotation.Generated;
 import javax.annotation.Nullable;
@@ -17,32 +12,27 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static com.google.common.base.Predicates.and;
-import static com.google.common.base.Predicates.in;
 import static com.google.common.base.Predicates.not;
-import static com.google.common.collect.Iterables.all;
 import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Iterables.removeIf;
 
-public class SimpleType implements Type {
+public class Type {
 
     private final Name name;
     private final List<Closure> closures = new ArrayList<>();
 
-    public SimpleType(Name name) {
+    public Type(Name name) {
         this.name = name;
     }
 
-    @Override
     public String getPackage() {
         return name.getPackage();
     }
 
-    @Override
     public Name getName() {
         return name;
     }
 
-    @Override
     public Iterable<String> getImports() {
         final Set<String> imports = new TreeSet<>();
 
@@ -78,7 +68,6 @@ public class SimpleType implements Type {
         return imports;
     }
 
-    @Override
     public List<Closure> getClosures() {
         return closures;
     }

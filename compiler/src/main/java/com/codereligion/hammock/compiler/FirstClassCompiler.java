@@ -1,21 +1,16 @@
 package com.codereligion.hammock.compiler;
 
 import com.codereligion.hammock.FirstClass;
-import com.codereligion.hammock.compiler.model.api.Closure;
-import com.codereligion.hammock.compiler.model.api.ClosureName;
-import com.codereligion.hammock.compiler.model.api.Name;
-import com.codereligion.hammock.compiler.model.api.Type;
-import com.codereligion.hammock.compiler.model.simple.BaseClosure;
-import com.codereligion.hammock.compiler.model.simple.SimpleType;
-import com.codereligion.hammock.compiler.model.simple.StringClosureName;
-import com.codereligion.hammock.compiler.model.simple.StringName;
+import com.codereligion.hammock.compiler.model.Closure;
+import com.codereligion.hammock.compiler.model.ClosureName;
+import com.codereligion.hammock.compiler.model.Name;
+import com.codereligion.hammock.compiler.model.Type;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Sets;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -37,14 +32,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import static javax.lang.model.element.ElementKind.METHOD;
-
 @SupportedAnnotationTypes("com.codereligion.hammock.FirstClass")
 public class FirstClassCompiler extends AbstractProcessor {
-
-    private final Set<ElementKind> supported = Sets.immutableEnumSet(
-            METHOD
-    );
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -54,27 +43,35 @@ public class FirstClassCompiler extends AbstractProcessor {
 
             @Override
             public Type load(TypeElement typeElement) throws Exception {
-                return new SimpleType(new StringName(typeElement.getQualifiedName() + "_"));
+                return new Type(new Name(typeElement.getQualifiedName() + "_"));
             }
 
         });
 
         for (TypeElement annotation : annotations) {
             for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
-                if (supported.contains(element.getKind())) {
-                    final ExecutableElement method = (ExecutableElement) element;
-                    final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
+                final ElementKind kind;
 
-                    if (check(method)) {
+                try {
+                    kind = parseAndCheck(element);
+                } catch (UnsupportedUsageException e) {
+                    error(e.getElement(), e.getMessage());
+                    continue;
+                }
+
+                switch (kind) {
+                    case METHOD:
+                        final ExecutableElement method = (ExecutableElement) element;
+                        final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
+
                         try {
                             parse(method, cache.get(typeElement));
                         } catch (ExecutionException e) {
                             throw new IllegalStateException(e);
                         }
+
                         claimed = true;
-                    }
-                } else {
-                    error(element, element.getKind() + " is not supported");
+                        break;
                 }
             }
         }
@@ -84,6 +81,39 @@ public class FirstClassCompiler extends AbstractProcessor {
         }
 
         return claimed;
+    }
+
+    private ElementKind parseAndCheck(Element element) throws UnsupportedUsageException {
+        final ElementKind kind = element.getKind();
+
+        switch (kind) {
+            case METHOD:
+                final ExecutableElement method = (ExecutableElement) element;
+                final Set<Modifier> modifiers = method.getModifiers();
+                final List<? extends VariableElement> parameters = method.getParameters();
+
+                final boolean isStatic = modifiers.contains(Modifier.STATIC);
+                
+                if (isStatic) {
+                    throw new UnsupportedUsageException(method, "static not supported");
+                }
+
+                final boolean hasParameters = !parameters.isEmpty();
+                
+                if (hasParameters) {
+                    throw new UnsupportedUsageException(method, "too many arguments");
+                }
+
+                final boolean returnsVoid = method.getReturnType().getKind() == TypeKind.VOID;
+                
+                if (returnsVoid) {
+                    throw new UnsupportedUsageException(method, "Void methods are not supported");
+                }
+
+                return kind;
+            default:
+                throw new UnsupportedUsageException(element, "unsupported usage");
+        }
     }
 
     private void write(Type type) {
@@ -112,41 +142,19 @@ public class FirstClassCompiler extends AbstractProcessor {
         }
     }
 
-    private boolean check(ExecutableElement method) {
-        final Set<Modifier> modifiers = method.getModifiers();
-        final List<? extends VariableElement> parameters = method.getParameters();
-
-        if (modifiers.contains(Modifier.STATIC)) {
-            error(method, "static not supported");
-            return false;
-        }
-
-        if (!parameters.isEmpty()) {
-            error(method, "too many arguments");
-            return false;
-        }
-
-        if (method.getReturnType().getKind() == TypeKind.VOID) {
-            error(method, "can't apply to void-methods");
-            return false;
-        }
-
-        return true;
-    }
-
     private void parse(ExecutableElement method, Type type) {
         final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
 
-        final FirstClass firstClass = method.getAnnotation(FirstClass.class);
-        final ClosureName name = new StringClosureName(method.getSimpleName().toString());
-        final Name parameterType = new StringName(typeElement.getQualifiedName().toString());
+        final FirstClass annotation = method.getAnnotation(FirstClass.class);
+        final ClosureName name = new ClosureName(method.getSimpleName().toString());
+        final Name parameterType = new Name(typeElement.getQualifiedName().toString());
 
         final Closure closure;
         if (method.getReturnType().getKind() == TypeKind.BOOLEAN) {
-            closure = new BaseClosure(name, parameterType, firstClass.nullsafe());
+            closure = new Closure(name, parameterType, annotation.nullsafe());
         } else {
-            final Name returnType = new StringName(method.getReturnType().toString());
-            closure = new BaseClosure(name, parameterType, returnType, firstClass.nullsafe());
+            final Name returnType = new Name(method.getReturnType().toString());
+            closure = new Closure(name, parameterType, returnType, annotation.nullsafe());
         }
 
         type.getClosures().add(closure);

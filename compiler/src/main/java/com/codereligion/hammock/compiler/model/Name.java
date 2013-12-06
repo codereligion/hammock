@@ -1,13 +1,12 @@
-package com.codereligion.hammock.compiler.model.simple;
+package com.codereligion.hammock.compiler.model;
 
-import com.codereligion.hammock.compiler.model.api.Name;
 import com.google.common.base.Objects;
 
-public class StringName implements Name {
+public class Name {
 
     private final String qualifiedName;
 
-    public StringName(String qualifiedName) {
+    public Name(String qualifiedName) {
         this.qualifiedName = qualifiedName;
     }
 
@@ -15,19 +14,16 @@ public class StringName implements Name {
         return qualifiedName.lastIndexOf('.');
     }
 
-    @Override
     public String getPackage() {
         final int dot = indexOfLastDot();
         return dot == -1 ? "" : qualifiedName.substring(0, dot);
     }
 
-    @Override
     public String getSimple() {
         final int dot = indexOfLastDot();
         return dot == -1 ? qualifiedName : qualifiedName.substring(dot + 1);
     }
 
-    @Override
     public String getQualified() {
         return qualifiedName;
     }
