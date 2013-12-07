@@ -5,9 +5,10 @@ import com.google.common.collect.FluentIterable;
 
 import java.util.List;
 
-import static com.codereligion.hammock.compiler.model.Argument.*;
+import static com.codereligion.hammock.compiler.model.Argument.IsInput;
+import static com.codereligion.hammock.compiler.model.Argument.To;
 import static com.google.common.base.Predicates.not;
-import static com.google.common.collect.FluentIterable.*;
+import static com.google.common.collect.FluentIterable.from;
 
 public final class Closure {
     
@@ -20,7 +21,8 @@ public final class Closure {
     private final List<Argument> arguments;
     private final Name returnType;
     private final boolean isStatic;
-    private final boolean nullsafe;
+    private final boolean graceful;
+    private final boolean nullTo;
 
     public Closure(ClosureBuilder builder) {
         this.name = builder.name;
@@ -30,7 +32,8 @@ public final class Closure {
         this.arguments = builder.arguments;
         this.returnType = builder.returnType;
         this.isStatic = builder.isStatic;
-        this.nullsafe = builder.nullsafe;
+        this.graceful = builder.graceful;
+        this.nullTo = builder.nullTo;
     }
 
     public final ClosureName getName() {
@@ -81,8 +84,12 @@ public final class Closure {
         return isStatic;
     }
 
-    public boolean isNullsafe() {
-        return nullsafe;
+    public boolean isGraceful() {
+        return graceful;
+    }
+
+    public boolean isNullTo() {
+        return nullTo;
     }
     
 }

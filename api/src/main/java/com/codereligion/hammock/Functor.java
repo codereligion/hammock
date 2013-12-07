@@ -11,6 +11,8 @@ public @interface Functor {
 
     String name() default "";
     
-    boolean nullsafe() default true;
+    boolean graceful() default false;
+    
+    boolean nullTo() default false;
 
 }

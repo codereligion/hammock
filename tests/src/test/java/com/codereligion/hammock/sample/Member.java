@@ -6,7 +6,7 @@ public class Member {
 
     private String name;
     private String nickName;
-    private boolean happy;
+    private boolean sad;
     private boolean active;
 
     @Functor(name = "toName")
@@ -18,7 +18,7 @@ public class Member {
         this.name = name;
     }
 
-    @Functor(nullsafe = false)
+    @Functor(graceful = true)
     public String getNickName() {
         return nickName;
     }
@@ -27,16 +27,16 @@ public class Member {
         this.nickName = nickName;
     }
 
-    @Functor
-    public boolean isHappy() {
-        return happy;
+    @Functor(graceful = true, nullTo = true)
+    public boolean isSad() {
+        return sad;
     }
 
-    public void setHappy(boolean happy) {
-        this.happy = happy;
+    public void setSad(boolean sad) {
+        this.sad = sad;
     }
 
-    @Functor
+    @Functor(graceful = true)
     public boolean isActive() {
         return active;
     }

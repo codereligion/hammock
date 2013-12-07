@@ -2,11 +2,11 @@ package com.codereligion.hammock.compiler;
 
 import com.codereligion.hammock.Functor;
 import com.codereligion.hammock.Input;
+import com.codereligion.hammock.compiler.model.Argument;
 import com.codereligion.hammock.compiler.model.Closure;
 import com.codereligion.hammock.compiler.model.ClosureBuilder;
 import com.codereligion.hammock.compiler.model.ClosureName;
 import com.codereligion.hammock.compiler.model.Name;
-import com.codereligion.hammock.compiler.model.Argument;
 import com.codereligion.hammock.compiler.model.Type;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -170,7 +170,8 @@ public class MethodParser implements Parser {
 
         builder.withName(name);
         builder.withStatic(isStatic);
-        builder.withNullsafe(annotation.nullsafe());
+        builder.withGraceful(annotation.graceful());
+        builder.withNullTo(annotation.nullTo());
 
         if (isStatic) {
             builder.withDelegate(typeElement.getSimpleName().toString());

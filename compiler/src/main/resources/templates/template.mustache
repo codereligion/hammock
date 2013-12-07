@@ -38,32 +38,31 @@ public final class {{{name.simple}}} {
 
     {{#predicate}}
         @Override
-        {{#nullsafe}}
         public boolean apply(@Nullable {{{input.type.simple}}} {{{input.name}}}) {
+        {{#graceful}}
+            {{#nullTo}}
+            return {{{input.name}}} == null || {{{delegate}}}.{{{method.toLowerCamel}}}({{{invocationList}}});
+            {{/nullTo}}
+            {{^nullTo}}
             return {{{input.name}}} != null && {{{delegate}}}.{{{method.toLowerCamel}}}({{{invocationList}}});
-        }
-        {{/nullsafe}}
-        {{^nullsafe}}
-        public boolean apply({{{input.type.simple}}} {{{input.name}}}) {
-            Preconditions.checkNotNull({{{input.name}}}, "{{{input.type.simple}}}");
+            {{/nullTo}}
+        {{/graceful}}
+        {{^graceful}}
             return {{{delegate}}}.{{{method.toLowerCamel}}}({{{invocationList}}});
+        {{/graceful}}
         }
-        {{/nullsafe}}
     {{/predicate}}
     {{^predicate}}
         @Nullable
         @Override
-        {{#nullsafe}}
         public {{{returnType.simple}}} apply(@Nullable {{{input.type.simple}}} {{{input.name}}}) {
+        {{#graceful}}
             return {{{input.name}}} == null ? null : {{{delegate}}}.{{{method.toLowerCamel}}}({{{invocationList}}});
-        }
-        {{/nullsafe}}
-        {{^nullsafe}}
-        public {{{returnType.simple}}} apply({{{input.type.simple}}} {{{input.name}}}) {
-            Preconditions.checkNotNull({{{input.name}}}, "{{{input.type.simple}}}");
+        {{/graceful}}
+        {{^graceful}}
             return {{{delegate}}}.{{{method.toLowerCamel}}}({{{invocationList}}});
+        {{/graceful}}
         }
-        {{/nullsafe}}
     {{/predicate}}
 
     }
@@ -76,24 +75,17 @@ public final class {{{name.simple}}} {
 
     {{#predicate}}
     public static Predicate<{{{input.type.simple}}}> {{{name.toLowerCamel}}}({{{parameterList}}}) {
-        {{#stateless}}
-        return {{{name.toUpperCamel}}}.INSTANCE;
-        {{/stateless}}
-        {{^stateless}}
-        return new {{{name.toUpperCamel}}}({{{argumentList}}});
-        {{/stateless}}
-    }
     {{/predicate}}
     {{^predicate}}
     public static Function<{{{input.type.simple}}}, {{{returnType.simple}}}> {{{name.toLowerCamel}}}({{{parameterList}}}) {
-        {{#stateless}}
-        return {{{name.toUpperCamel}}}.INSTANCE;
-        {{/stateless}}
-        {{^stateless}}
-        return new {{{name.toUpperCamel}}}({{{argumentList}}});
-        {{/stateless}}
-    }
     {{/predicate}}
+    {{#stateless}}
+        return {{{name.toUpperCamel}}}.INSTANCE;
+    {{/stateless}}
+    {{^stateless}}
+        return new {{{name.toUpperCamel}}}({{{argumentList}}});
+    {{/stateless}}
+    }
 {{/closures}}
 
 }
