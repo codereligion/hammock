@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.codereligion</groupId>
 		<artifactId>hammock-parent</artifactId>
-        <version>0.5</version>
+        <version>0.6</version>
 	</parent>
 
 	<artifactId>hammock-tests</artifactId>
