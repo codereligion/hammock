@@ -22,16 +22,6 @@
             <version>2.0.2</version>
         </dependency>
         <dependency>
-            <groupId>com.google.gag</groupId>
-            <artifactId>gag</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>15.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.spullara.mustache.java</groupId>
             <artifactId>compiler</artifactId>
             <version>0.8.13</version>

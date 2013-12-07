@@ -1,15 +1,15 @@
 package com.codereligion.hammock.sample;
 
-import com.codereligion.hammock.FirstClass;
+import com.codereligion.hammock.Functor;
 
 public class Member {
 
     private String name;
     private String nickName;
-    private boolean happy;
+    private boolean sad;
     private boolean active;
 
-    @FirstClass(name = "toName")
+    @Functor(name = "toName")
     public String getName() {
         return name;
     }
@@ -18,7 +18,7 @@ public class Member {
         this.name = name;
     }
 
-    @FirstClass(nullsafe = false)
+    @Functor(graceful = true)
     public String getNickName() {
         return nickName;
     }
@@ -27,16 +27,16 @@ public class Member {
         this.nickName = nickName;
     }
 
-    @FirstClass
-    public boolean isHappy() {
-        return happy;
+    @Functor(nullTo = true)
+    public boolean isSad() {
+        return sad;
     }
 
-    public void setHappy(boolean happy) {
-        this.happy = happy;
+    public void setSad(boolean sad) {
+        this.sad = sad;
     }
 
-    @FirstClass
+    @Functor(graceful = true)
     public boolean isActive() {
         return active;
     }

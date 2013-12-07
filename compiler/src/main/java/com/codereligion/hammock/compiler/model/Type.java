@@ -1,7 +1,6 @@
 package com.codereligion.hammock.compiler.model;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 
 import javax.annotation.Generated;
@@ -13,8 +12,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.google.common.base.Predicates.and;
-import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Iterables.removeIf;
 
@@ -57,14 +54,7 @@ public class Type {
             imports.add(Function.class.getName());
         }
         
-        if (any(closures, Is.NULLSAFE)) {
-            imports.add(Nullable.class.getName());
-        }
-
-        if (any(closures, not(Is.NULLSAFE))) {
-            imports.add(Preconditions.class.getName());
-        }
-        
+        imports.add(Nullable.class.getName());
         imports.add(Generated.class.getName());
 
         removeIf(imports, Exclude.JAVA_LANG);
@@ -109,15 +99,6 @@ public class Type {
                 return input != null && !input.isPredicate();
             }
 
-        },
-        
-        NULLSAFE {
-            
-            @Override
-            public boolean apply(@Nullable Closure input) {
-                return input != null && input.isNullsafe();
-            }
-            
         }
 
     }

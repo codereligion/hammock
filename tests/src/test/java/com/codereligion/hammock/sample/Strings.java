@@ -1,30 +1,30 @@
 package com.codereligion.hammock.sample;
 
-import com.codereligion.hammock.FirstClass;
+import com.codereligion.hammock.Functor;
 import com.codereligion.hammock.Input;
 
 import java.util.Locale;
 
 public class Strings {
 
-    @FirstClass
+    @Functor
     public static boolean isEmpty(String s) {
         return s.isEmpty();
     }
     
-    @FirstClass
+    @Functor
     public static String toLowerCamel(@Input String s, Locale locale) {
         return s.toLowerCase(locale);
     }
     
-    @FirstClass(nullsafe = false)
+    @Functor(graceful = true)
     public static String toUpperCamel(@Input String s, Locale locale) {
         return s.toUpperCase(locale);
     }
     
-    @FirstClass
-    public static String replace(String search, String replacement, @Input String target) {
-        return target.replace(search, replacement);
+    @Functor
+    public static String replace(String target, String replacement, @Input String s) {
+        return s.replace(target, replacement);
     }
 
 }

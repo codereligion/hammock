@@ -11,8 +11,9 @@ public final class ClosureBuilder {
     final ClosureName method;
     final List<Argument> arguments = new ArrayList<>();
     final Name returnType;
-    boolean isStatic = false;
-    boolean nullsafe = true;
+    boolean isStatic;
+    boolean graceful;
+    boolean nullTo;
 
     public ClosureBuilder(Argument input, ClosureName method, Name returnType) {
         this.input = input;
@@ -41,12 +42,15 @@ public final class ClosureBuilder {
         this.isStatic = isStatic;
     }
     
-    public void withNullsafe(boolean nullsafe) {
-        this.nullsafe = nullsafe;
+    public void withGraceful(boolean graceful) {
+        this.graceful = graceful;
     }
-    
+
+    public void withNullTo(boolean nullTo) {
+        this.nullTo = nullTo;
+    }
+
     public Closure build() {
         return new Closure(this);
     }
-    
 }
