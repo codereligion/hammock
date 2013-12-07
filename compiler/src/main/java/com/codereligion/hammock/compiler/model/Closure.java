@@ -85,7 +85,7 @@ public final class Closure {
     }
 
     public boolean isGraceful() {
-        return graceful;
+        return graceful || nullTo;
     }
 
     public boolean isNullTo() {

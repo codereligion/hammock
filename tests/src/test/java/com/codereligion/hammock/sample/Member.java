@@ -27,7 +27,7 @@ public class Member {
         this.nickName = nickName;
     }
 
-    @Functor(graceful = true, nullTo = true)
+    @Functor(nullTo = true)
     public boolean isSad() {
         return sad;
     }
