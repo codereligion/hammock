@@ -26,8 +26,8 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
-@SupportedAnnotationTypes("com.codereligion.hammock.FirstClass")
-public class FirstClassCompiler extends AbstractProcessor {
+@SupportedAnnotationTypes("com.codereligion.hammock.Functor")
+public class FunctorCompiler extends AbstractProcessor {
 
     private final Map<ElementKind, Parser> parsers = ImmutableMap.<ElementKind, Parser>of(
             ElementKind.METHOD, new MethodParser()
@@ -88,7 +88,7 @@ public class FirstClassCompiler extends AbstractProcessor {
         final ClassLoader original = thread.getContextClassLoader();
 
         try {
-            final ClassLoader loader = FirstClassCompiler.class.getClassLoader();
+            final ClassLoader loader = FunctorCompiler.class.getClassLoader();
             thread.setContextClassLoader(loader);
 
             final MustacheFactory factory = new DefaultMustacheFactory();

@@ -1,6 +1,6 @@
 package com.codereligion.hammock.compiler;
 
-import com.codereligion.hammock.FirstClass;
+import com.codereligion.hammock.Functor;
 import com.codereligion.hammock.Input;
 import com.codereligion.hammock.compiler.model.Closure;
 import com.codereligion.hammock.compiler.model.ClosureBuilder;
@@ -137,7 +137,7 @@ public class MethodParser implements Parser {
     public void parse(Element element, Function<TypeElement, Type> storage) {
         final ExecutableElement method = (ExecutableElement) element;
         final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
-        final FirstClass annotation = method.getAnnotation(FirstClass.class);
+        final Functor annotation = method.getAnnotation(Functor.class);
         final ClosureName delegate = new ClosureName(method.getSimpleName().toString());;
 
         final ClosureName name;

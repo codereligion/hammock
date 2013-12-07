@@ -1,10 +1,10 @@
 package com.codereligion.hammock.sample;
 
-import com.codereligion.hammock.FirstClass;
+import com.codereligion.hammock.Functor;
 
 public class Money {
 
-    @FirstClass
+    @Functor
     public boolean isGreatherThan(Money money) {
         return true;
     }

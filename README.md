@@ -43,13 +43,13 @@ using maven. The only runtime dependency is Guava.
 
 The first step is to annotate the methods you want to use:
 ```java
-import com.codereligion.hammock.FirstClass;
+import com.codereligion.hammock.Functor;
 
 public final class Member {
 
     ...
     
-    @FirstClass
+    @Functor
     public String getName() {
         return this.name;
     }
@@ -57,7 +57,7 @@ public final class Member {
 }
 ```
 
-That't it! As long as you have the hammock compiler on your classpath during
+That's it! As long as you have the hammock compiler on your classpath during
 compilation it will generate java source files for you which contain re-usable
 stateless singleton implementations for your functions. For every class with
 at least one annotated method Hammock will create a corresponding class in the
