@@ -7,7 +7,6 @@ import com.google.common.base.Predicate;
 import javax.annotation.Generated;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -42,7 +41,11 @@ public class Type {
         final Set<String> imports = new TreeSet<>();
 
         for (Closure closure : closures) {
-            imports.add(closure.getParameterType().getQualified());
+            for (Argument argument : closure.getArguments()) {
+                imports.add(argument.getType().getQualified());
+            }
+            
+            imports.add(closure.getInput().getType().getQualified());
             imports.add(closure.getReturnType().getQualified());
         }
 

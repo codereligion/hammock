@@ -2,12 +2,23 @@ package com.codereligion.hammock.compiler.model;
 
 import com.google.common.base.Objects;
 
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
+
 public class Name {
 
     private final String qualifiedName;
 
     public Name(String qualifiedName) {
         this.qualifiedName = qualifiedName;
+    }
+    
+    public Name(TypeMirror type) {
+        this.qualifiedName = type.toString();
+    }
+
+    public Name(TypeElement type) {
+        this.qualifiedName = type.getQualifiedName().toString();
     }
 
     private int indexOfLastDot() {

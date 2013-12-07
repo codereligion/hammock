@@ -8,27 +8,45 @@ import {{{.}}};
 public final class {{{name.simple}}} {
 {{#closures}}
 
+    {{#stateless}}
     private enum {{{name.toUpperCamel}}}
+    {{/stateless}}
+    {{^stateless}}
+    private static final class {{{name.toUpperCamel}}}
+    {{/stateless}}
     {{#predicate}}
-        implements Predicate<{{{parameterType.simple}}}> {
+        implements Predicate<{{{input.type.simple}}}> {
     {{/predicate}}
     {{^predicate}}
-        implements Function<{{{parameterType.simple}}}, {{{returnType.simple}}}> {
+        implements Function<{{{input.type.simple}}}, {{{returnType.simple}}}> {
     {{/predicate}}
 
+        {{#stateless}}
         INSTANCE;
+        {{/stateless}}
+        {{^stateless}}
+        {{#arguments}}
+        private final {{{type.simple}}} {{{name}}};
+        {{/arguments}}
+            
+        private {{{name.toUpperCamel}}}({{{parameterList}}}) {
+            {{#arguments}}
+            this.{{{name}}} = {{{name}}};
+            {{/arguments}}
+        }
+        {{/stateless}}
 
     {{#predicate}}
         @Override
         {{#nullsafe}}
-        public boolean apply(@Nullable {{{parameterType.simple}}} input) {
-            return input != null && input.{{{delegate.toLowerCamel}}}();
+        public boolean apply(@Nullable {{{input.type.simple}}} {{{input.name}}}) {
+            return {{{input.name}}} != null && {{{delegate}}}.{{{method.toLowerCamel}}}({{{invocationList}}});
         }
         {{/nullsafe}}
         {{^nullsafe}}
-        public boolean apply({{{parameterType.simple}}} input) {
-            Preconditions.checkNotNull(input, "{{{parameterType.simple}}}");
-            return input.{{{delegate.toLowerCamel}}}();
+        public boolean apply({{{input.type.simple}}} {{{input.name}}}) {
+            Preconditions.checkNotNull({{{input.name}}}, "{{{input.type.simple}}}");
+            return {{{delegate}}}.{{{method.toLowerCamel}}}({{{invocationList}}});
         }
         {{/nullsafe}}
     {{/predicate}}
@@ -36,14 +54,14 @@ public final class {{{name.simple}}} {
         @Nullable
         @Override
         {{#nullsafe}}
-        public {{{returnType.simple}}} apply(@Nullable {{{parameterType.simple}}} input) {
-            return input == null ? null : input.{{{delegate.toLowerCamel}}}();
+        public {{{returnType.simple}}} apply(@Nullable {{{input.type.simple}}} {{{input.name}}}) {
+            return {{{input.name}}} == null ? null : {{{delegate}}}.{{{method.toLowerCamel}}}({{{invocationList}}});
         }
         {{/nullsafe}}
         {{^nullsafe}}
-        public {{{returnType.simple}}} apply({{{parameterType.simple}}} input) {
-            Preconditions.checkNotNull(input, "{{{parameterType.simple}}}");
-            return input.{{{delegate.toLowerCamel}}}();
+        public {{{returnType.simple}}} apply({{{input.type.simple}}} {{{input.name}}}) {
+            Preconditions.checkNotNull({{{input.name}}}, "{{{input.type.simple}}}");
+            return {{{delegate}}}.{{{method.toLowerCamel}}}({{{invocationList}}});
         }
         {{/nullsafe}}
     {{/predicate}}
@@ -57,13 +75,23 @@ public final class {{{name.simple}}} {
 {{#closures}}
 
     {{#predicate}}
-    public static Predicate<{{{parameterType.simple}}}> {{{name.toLowerCamel}}}() {
+    public static Predicate<{{{input.type.simple}}}> {{{name.toLowerCamel}}}({{{parameterList}}}) {
+        {{#stateless}}
         return {{{name.toUpperCamel}}}.INSTANCE;
+        {{/stateless}}
+        {{^stateless}}
+        return new {{{name.toUpperCamel}}}({{{argumentList}}});
+        {{/stateless}}
     }
     {{/predicate}}
     {{^predicate}}
-    public static Function<{{{parameterType.simple}}}, {{{returnType.simple}}}> {{{name.toLowerCamel}}}() {
+    public static Function<{{{input.type.simple}}}, {{{returnType.simple}}}> {{{name.toLowerCamel}}}({{{parameterList}}}) {
+        {{#stateless}}
         return {{{name.toUpperCamel}}}.INSTANCE;
+        {{/stateless}}
+        {{^stateless}}
+        return new {{{name.toUpperCamel}}}({{{argumentList}}});
+        {{/stateless}}
     }
     {{/predicate}}
 {{/closures}}
