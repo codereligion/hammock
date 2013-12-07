@@ -147,7 +147,7 @@ parameters you need to annotate the parameter which acts as an input with `@Inpu
 public class Strings {
 
     @Functor
-    public String toLowerCase(@Input String s, Locale locale) {
+    public static String toLowerCase(@Input String s, Locale locale) {
         return s.toLowerCase(locale);
     }
 
