@@ -1,12 +1,12 @@
 package com.codereligion.hammock.compiler;
 
-import com.codereligion.hammock.FirstClass;
+import com.codereligion.hammock.Functor;
 import com.codereligion.hammock.Input;
+import com.codereligion.hammock.compiler.model.Argument;
 import com.codereligion.hammock.compiler.model.Closure;
 import com.codereligion.hammock.compiler.model.ClosureBuilder;
 import com.codereligion.hammock.compiler.model.ClosureName;
 import com.codereligion.hammock.compiler.model.Name;
-import com.codereligion.hammock.compiler.model.Argument;
 import com.codereligion.hammock.compiler.model.Type;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -137,7 +137,7 @@ public class MethodParser implements Parser {
     public void parse(Element element, Function<TypeElement, Type> storage) {
         final ExecutableElement method = (ExecutableElement) element;
         final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
-        final FirstClass annotation = method.getAnnotation(FirstClass.class);
+        final Functor annotation = method.getAnnotation(Functor.class);
         final ClosureName delegate = new ClosureName(method.getSimpleName().toString());;
 
         final ClosureName name;
@@ -170,7 +170,8 @@ public class MethodParser implements Parser {
 
         builder.withName(name);
         builder.withStatic(isStatic);
-        builder.withNullsafe(annotation.nullsafe());
+        builder.withGraceful(annotation.graceful());
+        builder.withNullTo(annotation.nullTo());
 
         if (isStatic) {
             builder.withDelegate(typeElement.getSimpleName().toString());

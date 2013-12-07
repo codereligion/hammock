@@ -1,15 +1,15 @@
 package com.codereligion.hammock.sample;
 
-import com.codereligion.hammock.FirstClass;
+import com.codereligion.hammock.Functor;
 
 public class Organization {
 
-    @FirstClass
+    @Functor
     public String getName() {
         return null;
     }
 
-    @FirstClass
+    @Functor
     public boolean isFull() {
         return false;
     }
