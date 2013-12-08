@@ -2,9 +2,6 @@ package com.codereligion.hammock.sample;
 
 import com.codereligion.hammock.Functor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Functor
 public class Department {
 

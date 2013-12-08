@@ -1,6 +1,5 @@
 package com.codereligion.hammock.compiler;
 
-import com.codereligion.hammock.sample.Department;
 import com.codereligion.hammock.sample.Department_;
 import com.codereligion.hammock.sample.Member_;
 import com.codereligion.hammock.sample.Optionals;
