@@ -2,6 +2,7 @@ package com.codereligion.hammock.compiler.model;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
 
 import javax.annotation.Generated;
 import javax.annotation.Nullable;
@@ -16,7 +17,7 @@ import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Iterables.removeIf;
 
 public class Type {
-    
+
     private static final Pattern GENERICS = Pattern.compile("<.+>");
 
     private final Name name;
@@ -41,7 +42,7 @@ public class Type {
             for (Argument argument : closure.getArguments()) {
                 imports.add(argument.getType().getQualified());
             }
-            
+
             imports.add(closure.getInput().getType().getQualified());
             imports.add(closure.getReturnType().getQualified());
         }
@@ -53,27 +54,27 @@ public class Type {
         if (any(closures, Is.FUNCTION)) {
             imports.add(Function.class.getName());
         }
-        
+
         imports.add(Nullable.class.getName());
         imports.add(Generated.class.getName());
 
         removeIf(imports, Exclude.JAVA_LANG);
-        removeIf(imports, Exclude.BOOLEAN);
+        removeIf(imports, Exclude.PRIMITIVES);
 
         final String samePackage = name.getPackage();
         removeIf(imports, startsWith(samePackage));
-        
+
         return ungenerify(imports);
     }
 
     private Set<String> ungenerify(Set<String> imports) {
         final Set<String> ungenerified = new TreeSet<>();
-        
+
         for (String name : imports) {
             final Matcher matcher = GENERICS.matcher(name);
             ungenerified.add(matcher.replaceAll(""));
         }
-        
+
         return ungenerified;
     }
 
@@ -84,7 +85,6 @@ public class Type {
     private enum Is implements Predicate<Closure> {
 
         PREDICATE {
-            
             @Override
             public boolean apply(@Nullable Closure input) {
                 return input != null && input.isPredicate();
@@ -93,7 +93,6 @@ public class Type {
         },
 
         FUNCTION {
-            
             @Override
             public boolean apply(@Nullable Closure input) {
                 return input != null && !input.isPredicate();
@@ -106,25 +105,31 @@ public class Type {
     private enum Exclude implements Predicate<String> {
 
         JAVA_LANG {
-            
             @Override
             public boolean apply(@Nullable String input) {
                 return input != null && input.startsWith("java.lang.");
             }
-            
+
         },
-        
-        BOOLEAN {
+
+        PRIMITIVES {
+
+            private final Set<String> primitives = ImmutableSet.of(
+                    "byte", "short", "int", "long",
+                    "float", "double",
+                    "boolean",
+                    "char"
+            );
 
             @Override
             public boolean apply(@Nullable String input) {
-                return "boolean".equals(input);
+                return primitives.contains(input);
             }
-            
+
         }
 
     }
-    
+
     private static Predicate<String> startsWith(final String prefix) {
         return new Predicate<String>() {
             @Override
