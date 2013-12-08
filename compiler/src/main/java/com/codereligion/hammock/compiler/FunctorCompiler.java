@@ -30,7 +30,9 @@ import java.util.Set;
 public class FunctorCompiler extends AbstractProcessor {
 
     private final Map<ElementKind, Parser> parsers = ImmutableMap.<ElementKind, Parser>of(
-            ElementKind.METHOD, new MethodParser()
+            ElementKind.METHOD, new MethodParser(),
+            ElementKind.CLASS, new TypeParser(),
+            ElementKind.INTERFACE, new TypeParser()
     );
 
     private final CacheLoader<TypeElement, Type> loader = new CacheLoader<TypeElement, Type>() {

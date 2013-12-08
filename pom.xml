@@ -10,7 +10,7 @@
 
     <groupId>com.codereligion</groupId>
     <artifactId>hammock-parent</artifactId>
-    <version>0.7</version>
+    <version>0.8</version>
     <packaging>pom</packaging>
 
     <name>Hammock</name>
@@ -57,6 +57,7 @@
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
+                    <debug>true</debug>
                     <compilerArgs>
                         <arg>-Werror</arg>
                     </compilerArgs>

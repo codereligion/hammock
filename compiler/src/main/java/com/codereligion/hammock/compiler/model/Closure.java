@@ -91,5 +91,5 @@ public final class Closure {
     public boolean isNullTo() {
         return nullTo;
     }
-    
+
 }

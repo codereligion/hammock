@@ -8,6 +8,10 @@ import java.util.Locale;
 
 public class Strings {
     
+    private Strings() {
+        
+    }
+    
     @Functor
     public static boolean isEmpty(String s) {
         return s.isEmpty();
