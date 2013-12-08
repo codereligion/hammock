@@ -4,29 +4,32 @@ import com.codereligion.hammock.sample.Member;
 import com.google.common.collect.FluentIterable;
 import org.junit.Test;
 
-import static com.codereligion.hammock.sample.Member_.isSad;
+import java.util.ArrayList;
+
+import static com.codereligion.hammock.sample.Member_.getNickName;
 import static com.google.common.collect.FluentIterable.from;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class NullToTest {
+public class GracefulTest {
 
     @Test
     public void test() {
         final Member alice = new Member();
-        alice.setName("Alice");
-        alice.setSad(false);
+        alice.setNickName("Ali");
 
         final Member bob = new Member();
-        bob.setName("Robert");
-        bob.setSad(true);
+        bob.setNickName("Bob");
 
         final Member charlie = null;
         
         final FluentIterable<Member> members = from(asList(alice, bob, charlie));
 
-        assertThat(members.filter(isSad()).size(), is(2));
+        final ArrayList<String> actual = new ArrayList<>();
+        members.transform(getNickName()).copyInto(actual);
+        
+        assertThat(actual, is(asList("Ali", "Bob", null)));
     }
 
 }

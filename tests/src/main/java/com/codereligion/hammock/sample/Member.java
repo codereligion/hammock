@@ -37,19 +37,6 @@ public class Member {
         this.sad = sad;
     }
 
-    @Functor(graceful = true)
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
     public void setAge(int age) {
         this.age = age;
     }
