@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.codereligion</groupId>
         <artifactId>hammock-parent</artifactId>
-        <version>0.7</version>
+        <version>0.8-SNAPSHOT</version>
     </parent>
 
     <artifactId>hammock-tests</artifactId>
@@ -28,6 +28,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.gag</groupId>
+            <artifactId>gag</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -77,10 +83,7 @@
                                         <limit implementation="org.jacoco.report.check.Limit">
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <!-- TODO fix coverage for private constructors -->
-                                            <!-- TODO fix coverage for generated enum methods -->
-                                            <!-- TODO move to 1.0 -->
-                                            <minimum>0.8</minimum>
+                                            <minimum>1.0</minimum>
                                         </limit>
                                         <limit implementation="org.jacoco.report.check.Limit">
                                             <counter>CLASS</counter>
