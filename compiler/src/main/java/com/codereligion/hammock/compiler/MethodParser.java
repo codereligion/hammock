@@ -139,18 +139,21 @@ public class MethodParser implements Parser {
 
     @Override
     public void parse(Element element, Function<TypeElement, Type> storage) {
+        final TypeElement typeElement = (TypeElement) element.getEnclosingElement();
+        final Functor annotation = typeElement.getAnnotation(Functor.class);
+        parse(element, storage, annotation == null ? null : new Configuration(annotation));
+    }
+
+    private void parse(Element element, Function<TypeElement, Type> storage, Configuration parent) {
         final ExecutableElement method = (ExecutableElement) element;
         final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
-        final Functor annotation = method.getAnnotation(Functor.class);
-        final ClosureName delegate = new ClosureName(method.getSimpleName().toString());;
 
-        final ClosureName name;
-        
-        if (annotation.name().isEmpty()) {
-            name = delegate;
-        } else {
-            name = new ClosureName(annotation.name());
-        }
+        final Functor annotation = method.getAnnotation(Functor.class);
+        final Configuration config = annotation == null ? parent : new Configuration(annotation).merge(parent);
+
+        final String defaultName = method.getSimpleName().toString();
+        final ClosureName delegate = new ClosureName(defaultName);
+        final ClosureName name = new ClosureName(config.getName().or(defaultName));
 
         final List<? extends VariableElement> parameters = method.getParameters();
         final boolean isStatic = method.getModifiers().contains(Modifier.STATIC);
@@ -162,7 +165,7 @@ public class MethodParser implements Parser {
         } else {
             input = new Argument(typeElement, "input");
         }
-        
+
         final ClosureBuilder builder;
 
         if (method.getReturnType().getKind() == TypeKind.BOOLEAN) {
@@ -174,8 +177,8 @@ public class MethodParser implements Parser {
 
         builder.withName(name);
         builder.withStatic(isStatic);
-        builder.withGraceful(annotation.graceful());
-        builder.withNullTo(annotation.nullTo());
+        builder.withGraceful(config.isGraceful());
+        builder.withNullTo(config.isNullTo());
 
         if (isStatic) {
             builder.withDelegate(typeElement.getSimpleName().toString());

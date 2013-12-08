@@ -1,5 +1,7 @@
 package com.codereligion.hammock.compiler;
 
+import com.codereligion.hammock.sample.Department;
+import com.codereligion.hammock.sample.Department_;
 import com.codereligion.hammock.sample.Member_;
 import com.codereligion.hammock.sample.Optionals;
 import com.codereligion.hammock.sample.Optionals_;
@@ -31,6 +33,7 @@ public class CodeCoverageTest {
         invokePrivateNoArgumentConstructor(Optionals.class);
         invokePrivateNoArgumentConstructor(Strings.class);
 
+        invokePrivateNoArgumentConstructor(Department_.class);
         invokePrivateNoArgumentConstructor(Member_.class);
         invokePrivateNoArgumentConstructor(Optionals_.class);
         invokePrivateNoArgumentConstructor(Strings_.class);
@@ -38,6 +41,7 @@ public class CodeCoverageTest {
 
     @Test
     public void enumMethods() throws Exception {
+        invokeEnumMethods(Department_.class);
         invokeEnumMethods(Member_.class);
         invokeEnumMethods(Optionals_.class);
         invokeEnumMethods(Strings_.class);
