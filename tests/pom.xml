@@ -15,12 +15,18 @@
             <groupId>com.codereligion</groupId>
             <artifactId>hammock-api</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.codereligion</groupId>
             <artifactId>hammock-compiler</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>15.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

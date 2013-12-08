@@ -43,7 +43,6 @@ dependencies just during compilation. The only runtime dependency is Guava.
     <groupId>com.codereligion</groupId>
     <artifactId>hammock-api</artifactId>
     <version>${hammock.version}</version>
-    <!-- use scope compile if you don't have Guava on your classpath -->
     <scope>provided</scope>
 </dependency>
 <dependency>
