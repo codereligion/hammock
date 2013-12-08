@@ -40,16 +40,20 @@ public class MethodParser implements Parser {
 
         final boolean isStatic = modifiers.contains(Modifier.STATIC);
 
-        if (isStatic && parameters.isEmpty()) {
-            throw new UnsupportedUsageException(method, "too few arguments");
-        }
-        
-        if (parameters.size() > 1 && isNotAnyAnnotatedWithInput(parameters)) {
-            throw new UnsupportedUsageException(method, "multiple parameters require one @Input");
-        }
-        
-        if (parameters.size() > 1 && isMoreThanOneAnnotatedWithInput(parameters)) {
-            throw new UnsupportedUsageException(method, "illegal usage of @Input");
+        if (isStatic) {
+            if (parameters.isEmpty()) {
+                throw new UnsupportedUsageException(method, "too few arguments");
+            }
+            
+            if (parameters.size() > 1) {
+                if (isNotAnyAnnotatedWithInput(parameters)) {
+                    throw new UnsupportedUsageException(method, "multiple parameters require one @Input");
+                }
+                
+                if (isMoreThanOneAnnotatedWithInput(parameters)) {
+                    throw new UnsupportedUsageException(method, "illegal usage of @Input");
+                }
+            }
         }
 
         final boolean isObjectMethod = isObjectMethod(method, parameters);

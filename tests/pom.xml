@@ -1,26 +1,33 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.codereligion</groupId>
-		<artifactId>hammock-parent</artifactId>
-        <version>0.6</version>
-	</parent>
+    <parent>
+        <groupId>com.codereligion</groupId>
+        <artifactId>hammock-parent</artifactId>
+        <version>0.7-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>hammock-tests</artifactId>
-	<name>Hammock Tests</name>
+    <artifactId>hammock-tests</artifactId>
+    <name>Hammock Tests</name>
 
     <dependencies>
         <dependency>
             <groupId>com.codereligion</groupId>
             <artifactId>hammock-api</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.codereligion</groupId>
             <artifactId>hammock-compiler</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>15.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -41,6 +48,62 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.6.3.201306030806</version>
+                <executions>
+                    <execution>
+                        <id>prepare-code-coverage</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>enforce-code-coverage</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule implementation="org.jacoco.maven.RuleConfiguration">
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit implementation="org.jacoco.report.check.Limit">
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <!-- TODO fix coverage for private constructors -->
+                                            <!-- TODO fix coverage for generated enum methods -->
+                                            <!-- TODO move to 1.0 -->
+                                            <minimum>0.8</minimum>
+                                        </limit>
+                                        <limit implementation="org.jacoco.report.check.Limit">
+                                            <counter>CLASS</counter>
+                                            <value>MISSEDCOUNT</value>
+                                            <maximum>0</maximum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.5.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
