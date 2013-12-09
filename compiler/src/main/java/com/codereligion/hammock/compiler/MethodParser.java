@@ -10,21 +10,28 @@ import com.codereligion.hammock.compiler.model.Name;
 import com.codereligion.hammock.compiler.model.Type;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.reflect.Invokable;
-import com.google.common.reflect.Parameter;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
-import java.lang.reflect.Method;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class MethodParser implements Parser {
+
+    private final ProcessingEnvironment env;
+
+    public MethodParser(ProcessingEnvironment env) {
+        this.env = env;
+    }
 
     @Override
     public void check(Element element) throws UnsupportedUsageException {
@@ -32,7 +39,7 @@ public class MethodParser implements Parser {
         final Set<Modifier> modifiers = method.getModifiers();
         final List<? extends VariableElement> parameters = method.getParameters();
 
-        final boolean returnsVoid = method.getReturnType().getKind() == TypeKind.VOID;
+        final boolean returnsVoid = MethodFilter.VOID.apply(method);
 
         if (returnsVoid) {
             throw new UnsupportedUsageException(method, "void methods are not supported");
@@ -56,7 +63,7 @@ public class MethodParser implements Parser {
             }
         }
 
-        final boolean isObjectMethod = isObjectMethod(method, parameters);
+        final boolean isObjectMethod = MethodFilter.OBJECT.apply(method);
 
         if (isObjectMethod) {
             throw new UnsupportedUsageException(method, "can't use java.lang.Object methods");
@@ -89,71 +96,15 @@ public class MethodParser implements Parser {
         return false;
     }
 
-    private boolean isObjectMethod(ExecutableElement method, List<? extends VariableElement> parameters) {
-        for (Method m : Object.class.getDeclaredMethods()) {
-            final Invokable<?, Object> invokable = Invokable.from(m);
-            final boolean isPrivate = invokable.isPrivate();
-
-            if (isPrivate) {
-                continue;
-            }
-
-            final boolean isNotSameName = !method.getSimpleName().toString().equals(invokable.getName());
-
-            if (isNotSameName) {
-                continue;
-            }
-
-            final boolean isDifferentNumberOfArguments = parameters.size() != invokable.getParameters().size();
-
-            if (isDifferentNumberOfArguments) {
-                continue;
-            }
-
-            final boolean typesMatch = typesMatch(parameters, invokable.getParameters());
-
-            if (typesMatch) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean typesMatch(List<? extends VariableElement> lefts, ImmutableList<Parameter> rights) {
-        for (int i = 0; i < lefts.size(); i++) {
-            final VariableElement left = lefts.get(i);
-            final Parameter right = rights.get(i);
-
-            final boolean typesMatch = left.asType().toString().equals(right.getClass().getName());
-
-            if (typesMatch) {
-                continue;
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
     @Override
     public void parse(Element element, Function<TypeElement, Type> storage) {
         final TypeElement typeElement = (TypeElement) element.getEnclosingElement();
-        final Functor annotation = typeElement.getAnnotation(Functor.class);
-        parse(element, storage, annotation == null ? null : new Configuration(annotation));
-    }
-
-    private void parse(Element element, Function<TypeElement, Type> storage, Configuration parent) {
         final ExecutableElement method = (ExecutableElement) element;
-        final TypeElement typeElement = (TypeElement) method.getEnclosingElement();
-
         final Functor annotation = method.getAnnotation(Functor.class);
-        final Configuration config = annotation == null ? parent : new Configuration(annotation).merge(parent);
 
         final String defaultName = method.getSimpleName().toString();
         final ClosureName delegate = new ClosureName(defaultName);
-        final ClosureName name = new ClosureName(config.getName().or(defaultName));
+        final ClosureName name = new ClosureName(annotation.name().isEmpty() ? defaultName : annotation.name());
 
         final List<? extends VariableElement> parameters = method.getParameters();
         final boolean isStatic = method.getModifiers().contains(Modifier.STATIC);
@@ -163,22 +114,23 @@ public class MethodParser implements Parser {
         if (isStatic) {
             input = findInput(parameters);
         } else {
-            input = new Argument(typeElement, "input");
+            input = new Argument(box(typeElement.asType()), "input");
         }
 
         final ClosureBuilder builder;
 
-        if (method.getReturnType().getKind() == TypeKind.BOOLEAN) {
+        TypeMirror returnType = method.getReturnType();
+        
+        if (returnType.getKind() == TypeKind.BOOLEAN) {
             builder = new ClosureBuilder(input, delegate);
         } else {
-            final Name returnType = new Name(method.getReturnType().toString());
-            builder = new ClosureBuilder(input, delegate, returnType);
+            builder = new ClosureBuilder(input, delegate, new Name(box(returnType).toString()));
         }
 
         builder.withName(name);
         builder.withStatic(isStatic);
-        builder.withGraceful(config.isGraceful());
-        builder.withNullTo(config.isNullTo());
+        builder.withGraceful(annotation.graceful());
+        builder.withNullTo(annotation.nullTo());
 
         if (isStatic) {
             builder.withDelegate(typeElement.getSimpleName().toString());
@@ -186,11 +138,11 @@ public class MethodParser implements Parser {
             for (VariableElement parameter : parameters) {
                 final boolean isInput = parameter.getAnnotation(Input.class) != null;
                 final boolean isOnlyParameter = parameters.size() == 1;
-                builder.withArgument(new Argument(parameter, isInput || isOnlyParameter));
+                builder.withArgument(new Argument(box(parameter.asType()), parameter, isInput || isOnlyParameter));
             }
         } else {
             for (VariableElement parameter : parameters) {
-                builder.withArgument(new Argument(parameter));
+                builder.withArgument(new Argument(box(parameter.asType()), parameter));
             }
         }
 
@@ -201,14 +153,34 @@ public class MethodParser implements Parser {
         type.getClosures().add(closure);
     }
 
+    private TypeElement box(TypeMirror returnType) {
+        final Types types = env.getTypeUtils();
+
+        final String name = returnType.toString();
+        switch (name) {
+            case "byte":
+            case "short":
+            case "int":
+            case "long":
+            case "float":
+            case "double":
+            case "char":
+            case "boolean":
+                final TypeKind kind = TypeKind.valueOf(name.toUpperCase(Locale.ENGLISH));
+                return types.boxedClass(types.getPrimitiveType(kind));
+            default:
+                return (TypeElement) types.asElement(returnType);
+        }
+    }
+
     private Argument findInput(List<? extends VariableElement> parameters) {
         if (parameters.size() == 1) {
             final VariableElement firstParameter = parameters.get(0);
-            return new Argument(firstParameter, true);
+            return new Argument(box(firstParameter.asType()), firstParameter, true);
         } else {
             for (VariableElement parameter : parameters) {
                 if (parameter.getAnnotation(Input.class) != null) {
-                    return new Argument(parameter);
+                    return new Argument(box(parameter.asType()), parameter);
                 }
             }
         }

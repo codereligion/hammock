@@ -13,9 +13,17 @@ public class ClosureName {
     public String toLowerCamel() {
         return lowerCamelName;
     }
+    
+    public String getLowerCamel() {
+        return toLowerCamel();
+    }
 
     public String toUpperCamel() {
         return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, lowerCamelName);
+    }
+    
+    public String getUpperCamel() {
+        return toUpperCamel();
     }
     
 }

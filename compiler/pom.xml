@@ -1,14 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.codereligion</groupId>
-		<artifactId>hammock-parent</artifactId>
+    <parent>
+        <groupId>com.codereligion</groupId>
+        <artifactId>hammock-parent</artifactId>
         <version>0.9-SNAPSHOT</version>
-	</parent>
+    </parent>
 
-	<artifactId>hammock-compiler</artifactId>
-	<name>Hammock Compiler</name>
+    <artifactId>hammock-compiler</artifactId>
+    <name>Hammock Compiler</name>
 
     <dependencies>
         <dependency>
@@ -27,7 +28,7 @@
             <version>0.8.13</version>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -43,5 +44,5 @@
             </plugin>
         </plugins>
     </build>
-    
+
 </project>

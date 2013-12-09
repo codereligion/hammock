@@ -1,9 +1,11 @@
 package com.codereligion.hammock.compiler;
 
-import com.codereligion.hammock.sample.Department_;
+import com.codereligion.hammock.sample.Integers;
+import com.codereligion.hammock.sample.Integers_;
 import com.codereligion.hammock.sample.Member_;
 import com.codereligion.hammock.sample.Optionals;
 import com.codereligion.hammock.sample.Optionals_;
+import com.codereligion.hammock.sample.Stock_;
 import com.codereligion.hammock.sample.Strings;
 import com.codereligion.hammock.sample.Strings_;
 import com.google.common.reflect.Invokable;
@@ -31,18 +33,23 @@ public class CodeCoverageTest {
     public void privateConstructors() throws Exception {
         invokePrivateNoArgumentConstructor(Optionals.class);
         invokePrivateNoArgumentConstructor(Strings.class);
+        invokePrivateNoArgumentConstructor(Integers.class);
 
-        invokePrivateNoArgumentConstructor(Department_.class);
+        invokePrivateNoArgumentConstructor(Integers_.class);
         invokePrivateNoArgumentConstructor(Member_.class);
         invokePrivateNoArgumentConstructor(Optionals_.class);
+        invokePrivateNoArgumentConstructor(Stock_.class);
+        invokePrivateNoArgumentConstructor(Stock_.Quantity_.class);
         invokePrivateNoArgumentConstructor(Strings_.class);
     }
 
     @Test
     public void enumMethods() throws Exception {
-        invokeEnumMethods(Department_.class);
+        invokeEnumMethods(Integers_.class);
         invokeEnumMethods(Member_.class);
         invokeEnumMethods(Optionals_.class);
+        invokeEnumMethods(Stock_.class);
+        invokeEnumMethods(Stock_.Quantity_.class);
         invokeEnumMethods(Strings_.class);
     }
     

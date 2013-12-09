@@ -1,0 +1,88 @@
+{{#types}}
+    
+    public static final class {{{name.simple}}} {
+        {{> type}}
+    
+    }
+{{/types}}
+{{#closures}}
+
+    {{#stateless}}
+    private enum {{{name.upperCamel}}}
+    {{/stateless}}
+    {{^stateless}}
+    private static final class {{{name.upperCamel}}}
+    {{/stateless}}
+    {{#predicate}}
+        implements Predicate<{{{input.type.simple}}}> {
+    {{/predicate}}
+    {{^predicate}}
+        implements Function<{{{input.type.simple}}}, {{{returnType.simple}}}> {
+    {{/predicate}}
+
+        {{#stateless}}
+        INSTANCE;
+        {{/stateless}}
+        {{^stateless}}
+        {{#arguments}}
+        private final {{{type.simple}}} {{{name}}};
+        {{/arguments}}
+            
+        private {{{name.upperCamel}}}({{{parameterList}}}) {
+            {{#arguments}}
+            this.{{{name}}} = {{{name}}};
+            {{/arguments}}
+        }
+        {{/stateless}}
+
+    {{#predicate}}
+        @Override
+        public boolean apply(@Nullable {{{input.type.simple}}} {{{input.name}}}) {
+        {{#graceful}}
+            {{#nullTo}}
+            return {{{input.name}}} == null || {{{delegate}}}.{{{method.lowerCamel}}}({{{invocationList}}});
+            {{/nullTo}}
+            {{^nullTo}}
+            return {{{input.name}}} != null && {{{delegate}}}.{{{method.lowerCamel}}}({{{invocationList}}});
+            {{/nullTo}}
+        {{/graceful}}
+        {{^graceful}}
+            return {{{delegate}}}.{{{method.lowerCamel}}}({{{invocationList}}});
+        {{/graceful}}
+        }
+    {{/predicate}}
+    {{^predicate}}
+        @Nullable
+        @Override
+        public {{{returnType.simple}}} apply(@Nullable {{{input.type.simple}}} {{{input.name}}}) {
+        {{#graceful}}
+            return {{{input.name}}} == null ? null : {{{delegate}}}.{{{method.lowerCamel}}}({{{invocationList}}});
+        {{/graceful}}
+        {{^graceful}}
+            return {{{delegate}}}.{{{method.lowerCamel}}}({{{invocationList}}});
+        {{/graceful}}
+        }
+    {{/predicate}}
+
+    }
+{{/closures}}
+
+    private {{{name.simple}}}() {
+
+    }
+{{#closures}}
+
+    {{#predicate}}
+    public static Predicate<{{{input.type.simple}}}> {{{name.lowerCamel}}}({{{parameterList}}}) {
+    {{/predicate}}
+    {{^predicate}}
+    public static Function<{{{input.type.simple}}}, {{{returnType.simple}}}> {{{name.lowerCamel}}}({{{parameterList}}}) {
+    {{/predicate}}
+    {{#stateless}}
+        return {{{name.upperCamel}}}.INSTANCE;
+    {{/stateless}}
+    {{^stateless}}
+        return new {{{name.upperCamel}}}({{{argumentList}}});
+    {{/stateless}}
+    }
+{{/closures}}
