@@ -1,6 +1,8 @@
 package com.codereligion.hammock.compiler;
 
 import com.codereligion.hammock.sample.Stock;
+import com.codereligion.hammock.sample.Table;
+import com.codereligion.hammock.sample.Table_;
 import org.junit.Test;
 
 import static com.codereligion.hammock.sample.Stock_.Quantity_.getQuantity;
@@ -11,7 +13,7 @@ import static org.hamcrest.Matchers.is;
 public class NestedClassesTest {
 
     @Test
-    public void test() {
+    public void twoLevels() {
         final Stock stock = new Stock();
         final Stock.Quantity quantity = stock.new Quantity();
         
@@ -25,5 +27,14 @@ public class NestedClassesTest {
         final Integer actual = from(stock.getQuantities()).transform(getQuantity()).get(0);
         assertThat(actual, is(100));
     }
+    
+    @Test
+    public void threeLevels() {
+        final Table.Row.Cell cell = new Table().new Row().new Cell();
+        cell.setValue("Value");
+        
+        assertThat(Table_.Row_.Cell_.getValue().apply(cell), is("Value"));
+    }
+    
 
 }
