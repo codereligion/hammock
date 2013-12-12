@@ -33,6 +33,50 @@ final Iterable<String> names = FluentIterable.from(members).transform(getName())
 Pretty compact, but you'll still need to write that function yourself which is
 quite a lot of boilerplate code. This is where Hammock comes into play:
 
+Annotate your methods with `@Functor`...
+
+```java
+import com.codereligion.hammock.Functor;
+
+public final class Member {
+
+    ...
+    
+    @Functor
+    public String getName() {
+        return name;
+    }
+
+}
+```
+
+... and Hammock will generate the following code for you:
+
+```java
+@Generated("com.codereligion.hammock.compiler.FunctorCompiler")
+public final class Member_ {
+
+    private enum GetName
+        implements Function<Member, String> {
+
+        INSTANCE;
+
+        @Nullable
+        @Override
+        public String apply(@Nullable Member input) {
+            return input.getName();
+        }
+
+    }
+
+    public static Function<Member, String> getName() {
+        return GetName.INSTANCE;
+    }
+
+}
+
+```
+
 ## Maven
 
 Hammock comes in two parts: an API and an annotation processor. You'll need both
@@ -56,30 +100,17 @@ dependencies just during compilation. The only runtime dependency is Guava.
 
 ## Quickstart
 
-The first step is to annotate the methods you want to use:
-```java
-import com.codereligion.hammock.Functor;
+At first, annotate the methods you want to use with `@Functor` and
+secondly make sure the *hammock-compiler* artifact is on your compile-time
+classpath.
 
-public final class Member {
-
-    ...
-    
-    @Functor
-    public String getName() {
-        return name;
-    }
-
-}
-```
-
-That's it! As long as you have the hammock compiler on your classpath during
-compilation it will generate java source files for you which contain re-usable
-stateless singleton implementations for your functions. For every class with
-at least one annotated method Hammock will create a corresponding class in the
-same package. In our example there will be a `Member_` class.
+That's it! The Hammock Compiler will generate java source files for you which contain
+implementations for your functions.
 
 Again assuming you're using static imports you can now use it like this:
 ```java
+import static com.codereligion.hammock.sample.Member_.getName;
+
 FluentIterable.from(members).transform(getName()).copyInto(names);
 ```
 
@@ -102,8 +133,17 @@ FluentIterable.from(members).transform(toName()).copyInto(names);
 By default parameters are not inspected in any way and just used/passed to the underlying
 method. If you want to explicitly handle nulls gracefully, use `@Functor(graceful = true)`.
 
-For functions the method will check for nulls and return null while predicates
-default to false for null inputs.
+For functions the method will check for nulls and return null 
+
+```java
+return input == null ? null : input.getName();
+```
+
+and predicates default to false for null inputs.
+
+```java
+return input != null && input.isHappy();
+```
 
 In case you want to treat null inputs to predicates as true use `@Functor(nullTo = true)`.
 
@@ -151,6 +191,12 @@ public class Strings {
     }
 
 }
+```
+
+The result can be used like it it were a non-static method annotated with `@Functor`:
+
+```java
+FluentIterable.from(..).transform(toLowerCase(Locale.ENGLISH)).copyInto(..);
 ```
 
 ## Attributions
