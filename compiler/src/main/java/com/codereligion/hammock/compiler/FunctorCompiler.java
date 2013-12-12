@@ -1,15 +1,20 @@
 package com.codereligion.hammock.compiler;
 
 import com.codereligion.hammock.compiler.model.Type;
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Resources;
+import freemarker.cache.URLTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
+import freemarker.template.Version;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -24,6 +29,7 @@ import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -122,21 +128,37 @@ public class FunctorCompiler extends AbstractProcessor {
             final ClassLoader loader = FunctorCompiler.class.getClassLoader();
             thread.setContextClassLoader(loader);
 
-            final MustacheFactory factory = new DefaultMustacheFactory();
-            final Mustache mustache = factory.compile("templates/template.mustache");
-            
-            for (Type type : types) {
-                try {
-                    final Filer filer = processingEnv.getFiler();
-                    final JavaFileObject file = filer.createSourceFile(type.getName().getQualified());
+            //final MustacheFactory factory = new DefaultMustacheFactory();
+            //final Mustache mustache = factory.compile("templates/template.mustache");
 
-                    try (Writer writer = file.openWriter()) {
-                        mustache.execute(writer, type).flush();
-                    }
-                } catch (IOException e) {
-                    throw new IllegalArgumentException(e);
+            final Configuration config = new Configuration();
+
+            config.setTemplateLoader(new URLTemplateLoader() {
+                @Override
+                protected URL getURL(String name) {
+                    return Resources.getResource(name);
+                }
+            });
+
+            config.setObjectWrapper(new DefaultObjectWrapper());
+            config.setDefaultEncoding("UTF-8");
+            config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+            config.setIncompatibleImprovements(new Version(2, 3, 20));  // FreeMarker 2.3.20
+            config.setLocalizedLookup(false);
+
+            final Template template = config.getTemplate("templates/template.ftl");
+
+            for (Type type : types) {
+                final Filer filer = processingEnv.getFiler();
+                final JavaFileObject file = filer.createSourceFile(type.getName().getQualified());
+
+                try (Writer writer = file.openWriter()) {
+                    //mustache.execute(writer, type).flush();
+                    template.process(type, writer);
                 }
             }
+        } catch (IOException | TemplateException e) {
+            throw new IllegalArgumentException(e);
         } finally {
             thread.setContextClassLoader(original);
         }

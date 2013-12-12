@@ -87,11 +87,21 @@ public class Type {
         removeIf(imports, startsWith(samePackage));
 
         // are in the same package, but still need to get imported explicitly
-        for (Type type : types) {
-            imports.add(type.element.getQualifiedName().toString());
+        for (Type type : getTypes()) {
+            addNestedToImports(type, imports);
         }
 
         return ungenerify(imports);
+    }
+
+    private void addNestedToImports(Type type, Set<String> imports) {
+        if (!type.getClosures().isEmpty()) {
+            imports.add(type.element.getQualifiedName().toString());
+        }
+        
+        for (Type subtype : type.getTypes()) {
+            addNestedToImports(subtype, imports);
+        }
     }
 
     private Set<String> ungenerify(Set<String> imports) {

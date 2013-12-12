@@ -8,6 +8,7 @@ import com.codereligion.hammock.sample.Optionals_;
 import com.codereligion.hammock.sample.Stock_;
 import com.codereligion.hammock.sample.Strings;
 import com.codereligion.hammock.sample.Strings_;
+import com.codereligion.hammock.sample.Table_;
 import com.google.common.reflect.Invokable;
 import com.google.gag.annotation.remark.Hack;
 import org.junit.Test;
@@ -41,6 +42,9 @@ public class CodeCoverageTest {
         invokePrivateNoArgumentConstructor(Stock_.class);
         invokePrivateNoArgumentConstructor(Stock_.Quantity_.class);
         invokePrivateNoArgumentConstructor(Strings_.class);
+        invokePrivateNoArgumentConstructor(Table_.class);
+        invokePrivateNoArgumentConstructor(Table_.Row_.class);
+        invokePrivateNoArgumentConstructor(Table_.Row_.Cell_.class);
     }
 
     @Test
@@ -51,6 +55,7 @@ public class CodeCoverageTest {
         invokeEnumMethods(Stock_.class);
         invokeEnumMethods(Stock_.Quantity_.class);
         invokeEnumMethods(Strings_.class);
+        invokeEnumMethods(Table_.Row_.Cell_.class);
     }
     
     private void invokePrivateNoArgumentConstructor(Class<?> type) throws Exception {
