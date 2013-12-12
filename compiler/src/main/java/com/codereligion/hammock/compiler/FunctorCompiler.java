@@ -92,7 +92,10 @@ public class FunctorCompiler extends AbstractProcessor {
     }
 
     private List<Type> compact(LoadingCache<TypeElement, Type> cache) {
-        for (Type type : cache.asMap().values()) {
+        // had some weird race condition when using the live view on the values
+        final ArrayList<Type> copy = new ArrayList<>(cache.asMap().values());
+        
+        for (Type type : copy) {
             Type current = type;
 
             while (true) {
