@@ -2,6 +2,7 @@ package com.codereligion.hammock.compiler.model;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
@@ -56,20 +57,24 @@ public final class Closure {
         return BOOLEAN.equals(returnType);
     }
 
-    public final FluentIterable<Argument> getArguments() {
+    public final ImmutableList<Argument> getArguments() {
+        return getArgumentsInternally().toList();
+    }
+
+    private FluentIterable<Argument> getArgumentsInternally() {
         return from(arguments).filter(not(IsInput.INSTANCE));
     }
-    
+
     public boolean isStateless() {
         return getArguments().isEmpty();
     }
     
     public final String getArgumentList() {
-        return Joiner.on(", ").join(getArguments().transform(To.NAME));
+        return Joiner.on(", ").join(getArgumentsInternally().transform(To.NAME));
     }
 
     public final String getParameterList() {
-        return Joiner.on(", ").join(getArguments().transform(To.PARAMETER));
+        return Joiner.on(", ").join(getArgumentsInternally().transform(To.PARAMETER));
     }
 
     public final String getInvocationList() {

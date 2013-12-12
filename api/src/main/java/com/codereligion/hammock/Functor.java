@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * them to first-class functions.
  */
 @Retention(RetentionPolicy.SOURCE)
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target(ElementType.METHOD)
 public @interface Functor {
 
     /**

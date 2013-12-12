@@ -25,11 +25,6 @@ public class Name {
         return qualifiedName.lastIndexOf('.');
     }
 
-    public String getPackage() {
-        final int dot = indexOfLastDot();
-        return dot == -1 ? "" : qualifiedName.substring(0, dot);
-    }
-
     public String getSimple() {
         final int dot = indexOfLastDot();
         return dot == -1 ? qualifiedName : qualifiedName.substring(dot + 1);

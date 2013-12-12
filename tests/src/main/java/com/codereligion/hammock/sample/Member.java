@@ -51,4 +51,10 @@ public class Member {
         return minimumAge < age && age < maximumAge;
     }
     
+    @Functor(name = "asString")
+    @Override
+    public String toString() {
+        return name;
+    }
+    
 }

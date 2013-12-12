@@ -13,14 +13,14 @@ public class Argument {
     private final String name;
     private final boolean input;
 
-    public Argument(VariableElement element) {
-        this.type = new Name(element.asType());
+    public Argument(TypeElement type, VariableElement element) {
+        this.type = new Name(type);
         this.name = element.getSimpleName().toString();
         this.input = element.getAnnotation(Input.class) != null;
     }
 
-    public Argument(VariableElement element, boolean input) {
-        this.type = new Name(element.asType());
+    public Argument(TypeElement type, VariableElement element, boolean input) {
+        this.type = new Name(type);
         this.name = element.getSimpleName().toString();
         this.input = input;
     }

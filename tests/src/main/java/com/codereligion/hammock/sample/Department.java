@@ -1,31 +1,30 @@
 package com.codereligion.hammock.sample;
 
-import com.codereligion.hammock.Functor;
+import com.google.common.base.Objects;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Functor
 public class Department {
 
     private String name;
-    private Member lead;
-
-    @Functor(name = "toName")
-    public String getName() {
-        return name;
-    }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public Member getLead() {
-        return lead;
+    @Override
+    public boolean equals(Object that) {
+        if (this == that) {
+            return true;
+        } else if (that instanceof Department) {
+            final Department other = (Department) that;
+            return Objects.equal(name, other.name);
+        } else {
+            return false;
+        }
     }
 
-    public void setLead(Member lead) {
-        this.lead = lead;
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
     }
-
+    
 }

@@ -3,9 +3,13 @@ package com.codereligion.hammock.compiler.model;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 import javax.annotation.Generated;
 import javax.annotation.Nullable;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,19 +24,33 @@ public class Type {
 
     private static final Pattern GENERICS = Pattern.compile("<.+>");
 
-    private final Name name;
     private final List<Closure> closures = new ArrayList<>();
+    private final List<Type> types = new ArrayList<>();
+    private final TypeElement element;
 
-    public Type(Name name) {
-        this.name = name;
+    public Type(TypeElement element) {
+        this.element = element;
+    }
+
+    public TypeElement getElement() {
+        return element;
     }
 
     public String getPackage() {
-        return name.getPackage();
+        Element parent = element.getEnclosingElement();
+        
+        while (true) {
+            if (parent instanceof PackageElement) {
+                final PackageElement packageElement = (PackageElement) parent;
+                return packageElement.getQualifiedName().toString();
+            } else {
+                parent = parent.getEnclosingElement();
+            }
+        }
     }
-
+    
     public Name getName() {
-        return name;
+        return new Name(element.getQualifiedName() + "_");
     }
 
     public Iterable<String> getImports() {
@@ -58,13 +76,32 @@ public class Type {
         imports.add(Nullable.class.getName());
         imports.add(Generated.class.getName());
 
+        for (Type type : types) {
+            Iterables.addAll(imports, type.getImports());
+        }
+
         removeIf(imports, Exclude.JAVA_LANG);
         removeIf(imports, Exclude.PRIMITIVES);
 
-        final String samePackage = name.getPackage();
+        final String samePackage = getPackage();
         removeIf(imports, startsWith(samePackage));
 
+        // are in the same package, but still need to get imported explicitly
+        for (Type type : getTypes()) {
+            addNestedToImports(type, imports);
+        }
+
         return ungenerify(imports);
+    }
+
+    private void addNestedToImports(Type type, Set<String> imports) {
+        if (!type.getClosures().isEmpty()) {
+            imports.add(type.element.getQualifiedName().toString());
+        }
+        
+        for (Type subtype : type.getTypes()) {
+            addNestedToImports(subtype, imports);
+        }
     }
 
     private Set<String> ungenerify(Set<String> imports) {
@@ -80,6 +117,10 @@ public class Type {
 
     public List<Closure> getClosures() {
         return closures;
+    }
+
+    public List<Type> getTypes() {
+        return types;
     }
 
     private enum Is implements Predicate<Closure> {
@@ -105,6 +146,7 @@ public class Type {
     private enum Exclude implements Predicate<String> {
 
         JAVA_LANG {
+            
             @Override
             public boolean apply(@Nullable String input) {
                 return input != null && input.startsWith("java.lang.");
