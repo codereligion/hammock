@@ -17,7 +17,7 @@
     <description>
         An annotation processor/code generator to simplify working with Guava's functional style APIs
     </description>
-    <url>https://github.com/whiskeysierra/hammock</url>
+    <url>https://github.com/codereligion/hammock</url>
 
     <prerequisites>
         <maven>3.0.5</maven>
@@ -36,9 +36,9 @@
     </licenses>
 
     <scm>
-        <url>scm:git:git@github.com:whiskeysierra/hammock.git</url>
-        <connection>scm:git:git@github.com:whiskeysierra/hammock.git</connection>
-        <developerConnection>scm:git:git@github.com:whiskeysierra/hammock.git</developerConnection>
+        <url>scm:git:git@github.com:codereligion/hammock.git</url>
+        <connection>scm:git:git@github.com:codereligion/hammock.git</connection>
+        <developerConnection>scm:git:git@github.com:codereligion/hammock.git</developerConnection>
     </scm>
 
     <developers>
