@@ -9,6 +9,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import freemarker.cache.URLTemplateLoader;
+import freemarker.log.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
@@ -51,6 +52,11 @@ public class FunctorCompiler extends AbstractProcessor {
         }
 
     };
+
+    // TODO(whiskeysierra): can we get rid of this somehow?
+    public FunctorCompiler() throws ClassNotFoundException {
+        Logger.selectLoggerLibrary(Logger.LIBRARY_NONE);
+    }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
