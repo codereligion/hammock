@@ -2,7 +2,7 @@
 <#-- @ftlvariable name="type" type="com.codereligion.hammock.compiler.model.Type" -->
 <#local indent>${""?left_pad(level * 4)}</#local>
 <#list type.types as subtype>
-
+ 
     ${indent}public static final class ${subtype.name.simple} {
     ${indent}    <@class type=subtype level=level+1/>
     ${indent}}
