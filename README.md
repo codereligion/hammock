@@ -1,4 +1,4 @@
-# Hammock [![Build Status](https://travis-ci.org/whiskeysierra/hammock.png?branch=master)](http://travis-ci.org/whiskeysierra/hammock)
+# Hammock [![Build Status](https://travis-ci.org/codereligion/hammock.png?branch=master)](http://travis-ci.org/codereligion/hammock)
 
 ![Hammock](http://farm1.staticflickr.com/89/255289520_04e0b04c7e_m_d.jpg)
 
