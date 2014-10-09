@@ -1,15 +1,8 @@
 package com.codereligion.hammock.compiler.model;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Iterables.removeIf;
 
-import javax.annotation.Generated;
-import javax.annotation.Nullable;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -17,8 +10,18 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.google.common.collect.Iterables.any;
-import static com.google.common.collect.Iterables.removeIf;
+import javax.annotation.Generated;
+import javax.annotation.Nullable;
+
+import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
+
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 public class Type {
 
@@ -28,7 +31,7 @@ public class Type {
     private final List<Type> types = new ArrayList<>();
     private final TypeElement element;
 
-    public Type(TypeElement element) {
+    public Type(final TypeElement element) {
         this.element = element;
     }
 
@@ -38,7 +41,7 @@ public class Type {
 
     public String getPackage() {
         Element parent = element.getEnclosingElement();
-        
+
         while (true) {
             if (parent instanceof PackageElement) {
                 final PackageElement packageElement = (PackageElement) parent;
@@ -48,7 +51,7 @@ public class Type {
             }
         }
     }
-    
+
     public Name getName() {
         return new Name(element.getQualifiedName() + "_");
     }
@@ -84,7 +87,7 @@ public class Type {
         removeIf(imports, Exclude.PRIMITIVES);
 
         final String samePackage = getPackage();
-        removeIf(imports, startsWith(samePackage));
+        removeIf(imports, Predicates.equalTo(samePackage));
 
         // are in the same package, but still need to get imported explicitly
         for (Type type : getTypes()) {
@@ -94,17 +97,17 @@ public class Type {
         return ungenerify(imports);
     }
 
-    private void addNestedToImports(Type type, Set<String> imports) {
+    private void addNestedToImports(final Type type, final Set<String> imports) {
         if (!type.getClosures().isEmpty()) {
             imports.add(type.element.getQualifiedName().toString());
         }
-        
+
         for (Type subtype : type.getTypes()) {
             addNestedToImports(subtype, imports);
         }
     }
 
-    private Set<String> ungenerify(Set<String> imports) {
+    private Set<String> ungenerify(final Set<String> imports) {
         final Set<String> ungenerified = new TreeSet<>();
 
         for (String name : imports) {
@@ -127,7 +130,7 @@ public class Type {
 
         PREDICATE {
             @Override
-            public boolean apply(@Nullable Closure input) {
+            public boolean apply(@Nullable final Closure input) {
                 return input != null && input.isPredicate();
             }
 
@@ -135,7 +138,7 @@ public class Type {
 
         FUNCTION {
             @Override
-            public boolean apply(@Nullable Closure input) {
+            public boolean apply(@Nullable final Closure input) {
                 return input != null && !input.isPredicate();
             }
 
@@ -146,9 +149,9 @@ public class Type {
     private enum Exclude implements Predicate<String> {
 
         JAVA_LANG {
-            
+
             @Override
-            public boolean apply(@Nullable String input) {
+            public boolean apply(@Nullable final String input) {
                 return input != null && input.startsWith("java.lang.");
             }
 
@@ -156,15 +159,11 @@ public class Type {
 
         PRIMITIVES {
 
-            private final Set<String> primitives = ImmutableSet.of(
-                    "byte", "short", "int", "long",
-                    "float", "double",
-                    "boolean",
-                    "char"
-            );
+            private final Set<String> primitives = ImmutableSet.of("byte", "short", "int", "long", "float", "double",
+                    "boolean", "char");
 
             @Override
-            public boolean apply(@Nullable String input) {
+            public boolean apply(@Nullable final String input) {
                 return primitives.contains(input);
             }
 
@@ -175,7 +174,7 @@ public class Type {
     private static Predicate<String> startsWith(final String prefix) {
         return new Predicate<String>() {
             @Override
-            public boolean apply(@Nullable String input) {
+            public boolean apply(@Nullable final String input) {
                 return input != null && input.startsWith(prefix);
             }
         };
