@@ -19,7 +19,6 @@ import javax.lang.model.element.TypeElement;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
@@ -86,8 +85,8 @@ public class Type {
         removeIf(imports, Exclude.JAVA_LANG);
         removeIf(imports, Exclude.PRIMITIVES);
 
-        final String samePackage = getPackage();
-        removeIf(imports, Predicates.equalTo(samePackage));
+        final String packageName = getPackage();
+        removeIf(imports, samePackage(packageName));
 
         // are in the same package, but still need to get imported explicitly
         for (Type type : getTypes()) {
@@ -171,11 +170,12 @@ public class Type {
 
     }
 
-    private static Predicate<String> startsWith(final String prefix) {
+    private static Predicate<String> samePackage(final String packageName) {
         return new Predicate<String>() {
             @Override
             public boolean apply(@Nullable final String input) {
-                return input != null && input.startsWith(prefix);
+                return input != null && input.startsWith(packageName)
+                        && input.indexOf('.', packageName.length() + 1) == -1;
             }
         };
     }
